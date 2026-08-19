@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us — PromptGenie</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar" class="mobile-sidebar" aria-hidden="true">
+        <button type="button" class="mobile-sidebar-close" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
+        <nav class="mobile-sidebar-nav">
+            <a href="index.html">Home</a>
+            <a href="explore.html">Explore</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="about.html" class="active">About</a>
+        </nav>
+        <div class="mobile-sidebar-actions">
+            <a href="login.html">Login</a>
+            <a href="signup.html" class="mobile-sidebar-cta">Start Free Trial</a>
+        </div>
+    </div>
+    <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileNav()"></div>
+
+    <!-- ================= Navbar ================= -->
+    <header>
+        <nav class="navbar">
+
+            <!-- Logo -->
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/logo.png" alt="Prompt Jump">
+                </a>
+            </div>
+
+            <!-- Center Menu -->
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="explore.html">Explore</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="about.html" class="active">About</a></li>
+            </ul>
+
+            <!-- Right Side -->
+            <div class="nav-right">
+                <a href="login.html" class="login">Login</a>
+                <a href="signup.html" class="trial-btn">Start Free Trial</a>
+            </div>
+
+            <button type="button" class="mobile-menu-btn" onclick="openMobileNav()" aria-label="Open menu">&#9776;</button>
+
+        </nav>
+    </header>
+
+    <!-- ================= About Hero ================= -->
+    <section class="about-hero-section">
+        <span class="about-badge">✨ REVOLUTIONIZING AI CREATIVITY</span>
+        <h1 class="about-hero-title">
+            Empowering Creators with the World's <span>Best AI Prompts</span>
+        </h1>
+        <p class="about-hero-sub">
+            PromptGenie was founded on a simple mission: eliminate the endless trial and error of AI generation and give every creator, developer, and marketer instant access to high-performing prompts.
+        </p>
+    </section>
+
+    <!-- ================= Stats Section ================= -->
+    <section class="about-stats-grid">
+        <div class="about-stat-card">
+            <div class="about-stat-number">50K+</div>
+            <div class="about-stat-label">Active Creators</div>
+        </div>
+        <div class="about-stat-card">
+            <div class="about-stat-number">100K+</div>
+            <div class="about-stat-label">Verified Prompts</div>
+        </div>
+        <div class="about-stat-card">
+            <div class="about-stat-number">4.9 / 5</div>
+            <div class="about-stat-label">Average Satisfaction</div>
+        </div>
+        <div class="about-stat-card">
+            <div class="about-stat-number">99.8%</div>
+            <div class="about-stat-label">Time Saved</div>
+        </div>
+    </section>
+
+    <!-- ================= Mission Section ================= -->
+    <section class="about-mission-section">
+        <div class="about-mission-card">
+            <div class="about-mission-text">
+                <h2>Bridging Human Vision with Artificial Intelligence</h2>
+                <p>
+                    Prompt engineering is the modern language of creation. Whether you are generating photorealistic Midjourney art, writing high-converting ChatGPT copy, or animating video with Runway & Kling, the quality of your output depends on the precision of your prompt.
+                </p>
+                <div class="about-feature-list">
+                    <div class="about-feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Rigorously tested & peer-reviewed prompts</span>
+                    </div>
+                    <div class="about-feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Multi-modal coverage (Text, Image, Video, Code)</span>
+                    </div>
+                    <div class="about-feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Instant one-click copy with parameter guides</span>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <img src="images/logo.png" alt="Prompt Jump" style="max-width: 260px; filter: drop-shadow(0 20px 30px rgba(79, 70, 255, 0.4));">
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= Values Section ================= -->
+    <section class="about-values-section">
+        <div class="about-section-header">
+            <h2>Our Core Pillars</h2>
+            <p>The principles driving everything we build at PromptGenie</p>
+        </div>
+
+        <div class="about-values-grid">
+            <div class="about-value-card">
+                <div class="about-value-icon">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <h3>Instant Excellence</h3>
+                <p>Every prompt on our platform is pre-tested across model versions to ensure immediate, professional-grade results without guesswork.</p>
+            </div>
+
+            <div class="about-value-card">
+                <div class="about-value-icon">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <h3>Multi-Model Mastery</h3>
+                <p>We support all leading generative AI models including ChatGPT-4o, Midjourney v6, DALL-E 3, Runway Gen-3, Kling AI, and Claude 3.5.</p>
+            </div>
+
+            <div class="about-value-card">
+                <div class="about-value-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3>Curated Quality</h3>
+                <p>No spam or low-effort submissions. Our community moderators ensure only high-value, reproducible prompts reach the explore feed.</p>
+            </div>
+
+            <div class="about-value-card">
+                <div class="about-value-icon">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <h3>Creator Ecosystem</h3>
+                <p>We empower prompt engineers to showcase their craft, build an audience, and earn recognition across the global AI community.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= Team Section ================= -->
+    <section class="about-team-section">
+        <div class="about-section-header">
+            <h2>Meet the Visionaries</h2>
+            <p>Passionate engineers, designers, and AI enthusiasts behind PromptGenie</p>
+        </div>
+
+        <div class="about-team-grid">
+            <div class="about-team-card">
+                <img src="https://i.pravatar.cc/150?img=33" alt="Elena Rostova" class="about-team-avatar">
+                <h3>Elena Rostova</h3>
+                <div class="role">Founder & CEO</div>
+                <p>Pioneer in generative AI workflows and former lead AI researcher.</p>
+            </div>
+
+            <div class="about-team-card">
+                <img src="https://i.pravatar.cc/150?img=12" alt="Marcus Vance" class="about-team-avatar">
+                <h3>Marcus Vance</h3>
+                <div class="role">Head of Prompt Engineering</div>
+                <p>Specializes in advanced LLM system prompts and multimodal generation.</p>
+            </div>
+
+            <div class="about-team-card">
+                <img src="https://i.pravatar.cc/150?img=60" alt="Sophia Chen" class="about-team-avatar">
+                <h3>Sophia Chen</h3>
+                <div class="role">Lead Product Designer</div>
+                <p>Crafting intuitive user interfaces and seamless creative tools.</p>
+            </div>
+
+            <div class="about-team-card">
+                <img src="https://i.pravatar.cc/150?img=68" alt="David Sterling" class="about-team-avatar">
+                <h3>David Sterling</h3>
+                <div class="role">Community Director</div>
+                <p>Connecting creators, hosting hackathons, and championing open prompt sharing.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= CTA Section ================= -->
+    <section class="about-cta-section">
+        <div class="about-cta-card">
+            <h2>Ready to Unlock Your AI Potential?</h2>
+            <p>Join thousands of creators using PromptGenie to generate breathtaking images, viral content, and high-level code in seconds.</p>
+            <a href="signup.html" class="about-cta-btn">Start Free Trial — It's Free</a>
+        </div>
+    </section>
+
+    <!-- ================= Footer ================= -->
+    <footer>
+        <div class="footer-container">
+
+            <div class="footer-col">
+                <div class="logo">
+                    <img src="images/logo.png" alt="Prompt Jump">
+                </div>
+                <p>
+                    Discover premium AI prompts for ChatGPT, Midjourney, Kling, Runway, Images, Videos, UI Design, SEO, Coding and much more.
+                </p>
+            </div>
+
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="explore.html">Explore</a></li>
+                    <li><a href="pricing.html">Pricing</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Categories</h3>
+                <ul>
+                    <li><a href="explore.html">AI Images</a></li>
+                    <li><a href="explore.html">AI Videos</a></li>
+                    <li><a href="explore.html">ChatGPT</a></li>
+                    <li><a href="explore.html">UI / UX</a></li>
+                    <li><a href="explore.html">SEO</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Newsletter</h3>
+                <p>Get the latest premium prompts delivered to your inbox.</p>
+                <form>
+                    <input type="email" placeholder="Enter your email">
+                    <button>Subscribe</button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 PromptGenie. All Rights Reserved.</p>
+            <div class="social">
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">YouTube</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- GSAP Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="script.js"></script>
+    <script src="mobile-nav.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing — Prompt Jump</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="pricing.css">
+</head>
+
+<body>
+
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar" class="mobile-sidebar" aria-hidden="true">
+        <button type="button" class="mobile-sidebar-close" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
+        <nav class="mobile-sidebar-nav">
+            <a href="index.html">Home</a>
+            <a href="explore.html">Explore</a>
+            <a href="pricing.html" class="active">Pricing</a>
+            <a href="about.html">About</a>
+        </nav>
+        <div class="mobile-sidebar-actions">
+            <a href="login.html">Login</a>
+            <a href="signup.html" class="mobile-sidebar-cta">Start Free Trial</a>
+        </div>
+    </div>
+    <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileNav()"></div>
+
+    <!-- ================= Navbar ================= -->
+    <header>
+        <nav class="navbar">
+
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/logo.png" alt="Prompt Jump">
+                </a>
+            </div>
+
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="explore.html">Explore</a></li>
+                <li><a href="pricing.html" class="active">Pricing</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+
+            <div class="nav-right">
+                <a href="login.html" class="login">Login</a>
+                <a href="signup.html" class="trial-btn">Start Free Trial</a>
+            </div>
+
+            <button type="button" class="mobile-menu-btn" onclick="openMobileNav()" aria-label="Open menu">&#9776;</button>
+
+        </nav>
+    </header>
+
+    <main class="pricing-page">
+
+        <div class="pricing_1">
+            <div class="responsive-container-block big-container">
+                <div class="responsive-container-block container">
+                    <p class="text-blk head">Pricing</p>
+                    <p class="text-blk subhead">Choose the plan that fits your creative workflow. Switch between monthly and yearly billing anytime.</p>
+
+                    <div class="responsive-container-block swiping-box">
+                        <div class="text-center witch switch-text">
+                            <span>Monthly</span>
+                            <div class="switch">
+                                <input type="checkbox" id="billingToggle" aria-label="Toggle yearly billing">
+                                <span class="slider round"></span>
+                            </div>
+                            <span>Yearly</span>
+                        </div>
+                    </div>
+
+                    <p id="pricingStatus" class="text-blk subhead" style="text-align:center;">Loading plans...</p>
+                    <div id="pricingCards" class="responsive-container-block card-container"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ================= Footer ================= -->
+    <footer class="footer">
+        <div class="footer-container">
+
+            <div class="footer-col">
+                <img src="images/logo.png" class="footer-logo" alt="Prompt Jump">
+                <p>
+                    Discover premium AI prompts for ChatGPT,
+                    Midjourney, Kling, Runway, Images, Videos,
+                    UI Design, SEO, Coding and much more.
+                </p>
+            </div>
+
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="explore.html">Explore</a></li>
+                    <li><a href="#">Categories</a></li>
+                    <li><a href="pricing.html">Pricing</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Categories</h3>
+                <ul>
+                    <li><a href="explore.html">AI Images</a></li>
+                    <li><a href="explore.html">AI Videos</a></li>
+                    <li><a href="explore.html">ChatGPT</a></li>
+                    <li><a href="explore.html">UI / UX</a></li>
+                    <li><a href="explore.html">SEO</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Newsletter</h3>
+                <p>Get the latest premium prompts delivered to your inbox.</p>
+                <form>
+                    <input type="email" placeholder="Enter your email">
+                    <button>Subscribe</button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 Prompt Jump. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="pricing.js"></script>
+    <script src="mobile-nav.js"></script>
+
+</body>
+
+</html>

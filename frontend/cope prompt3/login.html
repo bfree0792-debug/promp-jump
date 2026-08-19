@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pastel Login — PromptGenie</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="signup.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<body class="signup-body">
+
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar" class="mobile-sidebar" aria-hidden="true">
+        <button type="button" class="mobile-sidebar-close" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
+        <nav class="mobile-sidebar-nav">
+            <a href="index.html">Home</a>
+            <a href="explore.html">Explore</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="about.html">About</a>
+        </nav>
+        <div class="mobile-sidebar-actions">
+            <a href="login.html" class="active">Login</a>
+            <a href="signup.html" class="mobile-sidebar-cta">Start Free Trial</a>
+        </div>
+    </div>
+    <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileNav()"></div>
+
+    <!-- Navigation Bar -->
+    <header>
+        <nav class="navbar">
+
+            <!-- Logo -->
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/logo.png" alt="Prompt Jump">
+                </a>
+            </div>
+
+            <!-- Center Menu -->
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="explore.html">Explore</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+
+            <!-- Right Side -->
+            <div class="nav-right">
+                <a href="login.html" class="login active">Login</a>
+                <a href="signup.html" class="trial-btn">Start Free Trial</a>
+            </div>
+
+            <button type="button" class="mobile-menu-btn" onclick="openMobileNav()" aria-label="Open menu">&#9776;</button>
+
+        </nav>
+    </header>
+
+<div class="container">
+
+    <div class="left">
+
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logo.png" alt="Prompt Jump" class="left-logo">
+            </a>
+        </div>
+
+        <div class="review">
+
+            <div class="stars">★★★★★</div>
+
+            <h2>Welcome back to your AI creative suite!</h2>
+
+            <p>
+                PromptGenie saved our agency over 40 hours a week in prompt iteration.
+                Logging back in is always a joy to find new trending prompts.
+            </p>
+
+            <h4>Sarah Jenkins — Creative Director</h4>
+
+        </div>
+
+    </div>
+
+    <div class="right">
+
+        <div class="form-box">
+
+            <div class="users">
+                <img src="https://i.pravatar.cc/150?img=33">
+                <img src="https://i.pravatar.cc/150?img=12">
+                <img src="https://i.pravatar.cc/150?img=60">
+            </div>
+
+            <h1>Welcome Back! 👋</h1>
+
+            <p class="subtitle">
+                Enter your credentials to access your saved prompts & AI workspace.
+            </p>
+
+            <form id="loginForm" class="auth-form">
+            <div class="input-group">
+                <i class="fa-regular fa-envelope"></i>
+                <input name="email" type="email" placeholder="Email Address" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                <input id="password" name="password" type="password" placeholder="Password" required>
+
+                <i class="fa-regular fa-eye eye" onclick="togglePassword()"></i>
+            </div>
+
+            <div class="forgot-row">
+                <label>
+                    <input type="checkbox" checked> Remember me
+                </label>
+                <a href="forgot-password.html">Forgot password?</a>
+            </div>
+
+            <p class="auth-message" aria-live="polite"></p>
+
+            <button class="signup-btn" type="submit">
+                Log In
+            </button>
+            </form>
+
+            <div class="divider">
+                <span>or continue with</span>
+            </div>
+
+            <div class="social">
+
+                <button class="google">
+                    <i class="fab fa-google"></i>
+                    Log in with Google
+                </button>
+
+                <button class="facebook">
+                    <i class="fab fa-facebook"></i>
+                    Log in with Facebook
+                </button>
+
+            </div>
+
+            <div class="bottom">
+                <a href="signup.html">Don't have an account? Sign Up</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+<script src="auth.js"></script>
+<script src="mobile-nav.js"></script>
+
+</body>
+</html>

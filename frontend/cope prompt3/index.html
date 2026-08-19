@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptGenie</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="pricing.css">
+    <script src="mobile-nav.js" defer></script>
+</head>
+
+<body>
+
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar" class="mobile-sidebar" aria-hidden="true">
+        <button type="button" class="mobile-sidebar-close" aria-label="Close menu">&times;</button>
+        <nav class="mobile-sidebar-nav">
+            <a href="index.html" class="active">Home</a>
+            <a href="/explore.html">Explore</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="about.html">About</a>
+        </nav>
+        <div class="mobile-sidebar-actions">
+            <a href="login.html">Login</a>
+            <a href="/signup.html" class="mobile-sidebar-cta">Start Free Trial</a>
+        </div>
+    </div>
+    <div id="mobileOverlay" class="mobile-overlay"></div>
+
+    <!-- ================= Navbar ================= -->
+
+    <header>
+        <nav class="navbar">
+
+            <!-- Logo -->
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/logo.png" alt="Prompt Jump">
+                </a>
+            </div>
+
+            <!-- Center Menu -->
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="explore.html">Explore</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+
+            <!-- Right Side -->
+            <div class="nav-right">
+                <a href="login.html" class="login">Login</a>
+                <a href="/signup.html" class="trial-btn">Start Free Trial</a>
+            </div>
+
+            <button type="button" class="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
+
+        </nav>
+    </header>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- ================= Hero Section ================= -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <h1>
+                Find. Copy. Create.
+                <br>
+                Amazing AI Content
+            </h1>
+
+            <p>
+                Discover premium prompts for AI image,
+                ChatGPT, Midjourney, Kling, Runway...
+            </p>
+
+            <div class="hero-buttons">
+                <a href="/signup.html" class="btn-primary">Start Free Trial</a>
+                <a href="/explore.html" class="btn-secondary">Explore</a>
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= Cards ================= -->
+
+
+    <div class="slider">
+
+        <div class="slide-track">
+
+            <!-- First Set -->
+            <div class="prompt-card"><img src="p1.jpeg"></div>
+            <div class="prompt-card"><img src="p2.jpeg"></div>
+            <div class="prompt-card"><img src="p3.jpeg"></div>
+            <div class="prompt-card"><img src="p4.jpeg"></div>
+            <div class="prompt-card"><img src="p5.jpeg"></div>
+            <div class="prompt-card"><img src="p6.jpeg"></div>
+            <div class="prompt-card"><img src="p7.jpeg"></div>
+            <div class="prompt-card"><img src="p8.jpeg"></div>
+            <div class="prompt-card"><img src="p9.jpeg"></div>
+            <div class="prompt-card"><img src="p10.jpeg"></div>
+
+            <!-- Duplicate Set -->
+            <div class="prompt-card"><img src="11.png"></div>
+            <div class="prompt-card"><img src="12.jpg"></div>
+            <div class="prompt-card"><img src="13.jpg"></div>
+            <div class="prompt-card"><img src="14.png"></div>
+            <div class="prompt-card"><img src="15.png"></div>
+            <div class="prompt-card"><img src="16.jpg"></div>
+            <div class="prompt-card"><img src="17.jpg"></div>
+            <div class="prompt-card"><img src="18.png"></div>
+            <div class="prompt-card"><img src="19.jpg"></div>
+            <div class="prompt-card"><img src="20.jpg"></div>
+
+        </div>
+
+    </div>
+
+    <!-- =========================
+       SERVICES SECTION
+  ========================= -->
+    <section class="services-section">
+        <p class="services-small-top">everything you need to grow online</p>
+        <h2 class="services-heading">
+            <span>What</span>
+            <span>We</span>
+            <span>Do</span>
+        </h2>
+        <p class="services-small-bottom">
+            We create modern digital experiences that help businesses
+            grow faster and stand out online.
+        </p>
+    </section>
+
+    <!-- =========================
+       STACK CARDS SECTION
+  ========================= -->
+    <section class="stack-section">
+
+        <div class="stack-card" style="--card-bg: #e8f4ff;">
+            <div class="stack-card-inner">
+                <div class="stack-card-text">
+                    <span class="service-num">01</span>
+                    <h3 class="service-title">Web Design</h3>
+                    <p class="service-desc">Beautiful, responsive websites built to convert visitors into customers.</p>
+                </div>
+                <div class="stack-card-img">
+                    <video src="project1.mp4" autoplay loop muted playsinline></video>
+                </div>
+            </div>
+        </div>
+
+        <div class="stack-card" style="--card-bg: #fff3e8;">
+            <div class="stack-card-inner">
+                <div class="stack-card-text">
+                    <span class="service-num">02</span>
+                    <h3 class="service-title">Branding</h3>
+                    <p class="service-desc">Strong visual identities that make your brand impossible to forget.</p>
+                </div>
+                <div class="stack-card-img">
+                    <video src="project2.mp4" autoplay loop muted playsinline></video>
+                </div>
+            </div>
+        </div>
+
+        <div class="stack-card" style="--card-bg: #f0ffe8;">
+            <div class="stack-card-inner">
+                <div class="stack-card-text">
+                    <span class="service-num">03</span>
+                    <h3 class="service-title">Development</h3>
+                    <p class="service-desc">Fast, clean and scalable code that powers your digital presence.</p>
+                </div>
+                <div class="stack-card-img">
+                    <video src="project3.mp4" autoplay loop muted playsinline></video>
+                </div>
+            </div>
+        </div>
+
+        <div class="stack-card" style="--card-bg: #ffe8f0;">
+            <div class="stack-card-inner">
+                <div class="stack-card-text">
+                    <span class="service-num">04</span>
+                    <h3 class="service-title">SEO & Growth</h3>
+                    <p class="service-desc">Data-driven strategies to grow your traffic and dominate search results.</p>
+                </div>
+                <div class="stack-card-img">
+                    <video src="project4.mp4" autoplay loop muted playsinline></video>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- =========================
+       PROMPT HEADLINE SECTION
+  ========================= -->
+    <section class="prompt-headline-section">
+        <div class="prompt-headline-content">
+            <h2 class="prompt-headline">
+                <span>Good</span> <span>prompts</span> <span>create</span> <span>good</span> <span>results.</span>
+            </h2>
+            <p class="prompt-headline-sub">
+                Stop wasting tokens on bad prompts. Use expertly crafted prompts
+                that generate high-quality results on the first try.
+            </p>
+        </div>
+    </section>
+
+    <!-- =========================
+       PROMPT CARDS SLIDER
+  ========================= -->
+    <section class="prompt-section">
+        <div class="slider">
+            <div class="slide-track">
+
+                <!-- First Set -->
+                <div class="prompt-card"><img src="p1.jpeg"></div>
+                <div class="prompt-card"><img src="p2.jpeg"></div>
+                <div class="prompt-card"><img src="p3.jpeg"></div>
+                <div class="prompt-card"><img src="p4.jpeg"></div>
+                <div class="prompt-card"><img src="p5.jpeg"></div>
+                <div class="prompt-card"><img src="p6.jpeg"></div>
+                <div class="prompt-card"><img src="p7.jpeg"></div>
+                <div class="prompt-card"><img src="p8.jpeg"></div>
+                <div class="prompt-card"><img src="p9.jpeg"></div>
+                <div class="prompt-card"><img src="p10.jpeg"></div>
+
+                <!-- Duplicate Set (for seamless loop) -->
+                <div class="prompt-card"><img src="11.png"></div>
+                <div class="prompt-card"><img src="12.jpg"></div>
+                <div class="prompt-card"><img src="13.jpg"></div>
+                <div class="prompt-card"><img src="14.png"></div>
+                <div class="prompt-card"><img src="15.png"></div>
+                <div class="prompt-card"><img src="16.jpg"></div>
+                <div class="prompt-card"><img src="17.jpg"></div>
+                <div class="prompt-card"><img src="18.png"></div>
+                <div class="prompt-card"><img src="19.jpg"></div>
+                <div class="prompt-card"><img src="20.jpg"></div>
+
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- =========================
+     LANDSCAPE CARDS SLIDER
+========================= -->
+    <section class="landscape-section">
+        <div class="landscape-slider">
+            <div class="landscape-track">
+
+                <!-- First Set -->
+                <div class="landscape-card"><img src="111.jpg"></div>
+                <div class="landscape-card"><img src="222.png"></div>
+                <div class="landscape-card"><img src="333.jpg"></div>
+                <div class="landscape-card"><img src="444.jpg"></div>
+                <div class="landscape-card"><img src="555.jpg"></div>
+                <div class="landscape-card"><img src="666.jpg"></div>
+                <div class="landscape-card"><img src="777.jpg"></div>
+                <div class="landscape-card"><img src="888.png"></div>
+                <div class="landscape-card"><img src="999.jpg"></div>
+                <div class="landscape-card"><img src="100.jpg"></div>
+
+                <!-- Duplicate Set (for seamless loop) -->
+                <div class="landscape-card"><img src="122.jpg"></div>
+                <div class="landscape-card"><img src="133.jpg"></div>
+                <div class="landscape-card"><img src="111.jpg"></div>
+                <div class="landscape-card"><img src="222.png"></div>
+                <div class="landscape-card"><img src="333.jpg"></div>
+                <div class="landscape-card"><img src="444.jpg"></div>
+                <div class="landscape-card"><img src="555.jpg"></div>
+                <div class="landscape-card"><img src="666.jpg"></div>
+                <div class="landscape-card"><img src="777.jpg"></div>
+                <div class="landscape-card"><img src="888.png"></div>
+
+            </div>
+        </div>
+    </section>
+    <!-- =========================
+     TRENDING SECTION
+========================= -->
+    <section class="trending-section">
+        <div class="trending-content">
+            <h2 class="trending-heading">
+                <span>Trending</span> <span>Prompts</span> <span>This</span> <span>Week</span>
+            </h2>
+            <p class="trending-sub">
+                Explore the best AI prompts for creating images, videos, websites,
+                resumes, SEO content, code, and much more. New prompts added every week.
+            </p>
+        </div>
+    </section>
+
+
+
+
+
+
+
+    <!-- =========================
+       SNEAKER GALLERY (BOTTOM)
+  ========================= -->
+    <section class="sneaker-gallery">
+        <ul>
+            <li>
+                <div class="details">
+                    <img src="111.jpg">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="222.png">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="333.jpg">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="444.jpg">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="555.jpg">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="666.jpg">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="777.jpg">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="888.png">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="999.jpg">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="100.jpg">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="122.jpg">
+                </div>
+            </li>
+            <li>
+                <div class="details">
+                    <img src="133.jpg">
+                </div>
+            </li>
+        </ul>
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <section class="bottom-content">
+
+        <h2>
+            Create Amazing AI Content
+            <br>
+            on Your First Try
+        </h2>
+
+        <p>
+            Stop wasting time on weak prompts. Use our premium prompt library
+            to generate stunning videos, images, UI designs, resumes, scripts,
+            SEO content, and more—faster and with better results.
+        </p>
+
+    </section>
+
+
+
+
+
+
+
+    <section class="video-gallery">
+
+        <!-- Card 1 -->
+        <div class="video-card">
+            <video src="video1.mp4" autoplay muted loop playsinline></video>
+
+            <div class="video-info">
+
+                <span class="category">AI VIDEO</span>
+
+                <h3>Cinematic Car Chase</h3>
+
+                <p>
+                    Create Hollywood-quality action scenes with realistic camera
+                    movements, lighting, explosions, and cinematic effects.
+                </p>
+
+                <div class="video-footer">
+                    <span>⭐⭐⭐⭐⭐</span>
+                    <button>Copy Prompt</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Copy this card and change the content -->
+
+        <div class="video-card">
+            <video src="video2.mp4" autoplay muted loop playsinline></video>
+
+            <div class="video-info">
+                <span class="category">MIDJOURNEY</span>
+                <h3>Fantasy Landscape</h3>
+                <p>Create ultra-realistic fantasy environments with dramatic lighting and cinematic composition.</p>
+
+                <div class="video-footer">
+                    <span>⭐⭐⭐⭐⭐</span>
+                    <button>Copy Prompt</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <video src="video3.mp4" autoplay muted loop playsinline></video>
+
+            <div class="video-info">
+                <span class="category">CHATGPT</span>
+                <h3>YouTube Script</h3>
+                <p>Generate engaging YouTube documentary scripts with hooks, storytelling, and powerful endings.</p>
+
+                <div class="video-footer">
+                    <span>⭐⭐⭐⭐⭐</span>
+                    <button>Copy Prompt</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <video src="video4.mp4" autoplay muted loop playsinline></video>
+
+            <div class="video-info">
+                <span class="category">SEO</span>
+                <h3>SEO Blog Writer</h3>
+                <p>Create SEO-friendly blog posts optimized for Google ranking with one premium prompt.</p>
+
+                <div class="video-footer">
+                    <span>⭐⭐⭐⭐⭐</span>
+                    <button>Copy Prompt</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <img src="ats.png">autoplay muted loop playsinline></video>
+
+            <div class="video-info">
+                <span class="category">RESUME</span>
+                <h3>ATS Resume Builder</h3>
+                <p>Create a professional ATS-friendly resume that helps you get more interviews.</p>
+
+                <div class="video-footer">
+                    <span>⭐⭐⭐⭐⭐</span>
+                    <button>Copy Prompt</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <video src="video6.mp4" autoplay muted loop playsinline></video>
+
+            <div class="video-info">
+                <span class="category">UI / UX</span>
+                <h3>SaaS Dashboard</h3>
+                <p>Generate premium dashboard designs with modern layouts and beautiful UI components.</p>
+
+                <div class="video-footer">
+                    <span>⭐⭐⭐⭐⭐</span>
+                    <button>Copy Prompt</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <video src="video7.mp4" autoplay muted loop playsinline></video>
+
+            <div class="video-info">
+                <span class="category">IMAGE AI</span>
+                <h3>Product Photography</h3>
+                <p>Create studio-quality product photos with luxury lighting and realistic reflections.</p>
+
+                <div class="video-footer">
+                    <span>⭐⭐⭐⭐⭐</span>
+                    <button>Copy Prompt</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <video src="video8.mp4" autoplay muted loop playsinline></video>
+
+            <div class="video-info">
+                <span class="category">SOCIAL MEDIA</span>
+                <h3>Instagram Reels</h3>
+                <p>Create viral Reels with hooks, captions, transitions, and trending storytelling ideas.</p>
+
+                <div class="video-footer">
+                    <span>⭐⭐⭐⭐⭐</span>
+                    <button>Copy Prompt</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <video src="video9.mp4" autoplay muted loop playsinline></video>
+
+            <div class="video-info">
+                <span class="category">AI AGENT</span>
+                <h3>AI Workflow</h3>
+                <p>Build intelligent AI workflows and automation systems using ready-made premium prompts.</p>
+
+                <div class="video-footer">
+                    <span>⭐⭐⭐⭐⭐</span>
+                    <button>Copy Prompt</button>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+    <!-- =========================
+     STATS SECTION
+========================= -->
+
+    <section class="stats-section">
+
+        <div class="stats-header">
+
+            <h2>
+                <span class="highlight">Write once.</span>
+                Never waste tokens.
+            </h2>
+
+            <h3>
+                From raw idea to first-try results, in seconds.
+            </h3>
+
+            <p>
+                Most people send 5–10 follow-up prompts before getting the result
+                they actually want. Our premium prompt library helps you generate
+                amazing AI content on the first try-saving time, tokens, and effort.
+            </p>
+
+            <small>
+                Trusted by 200,000+ AI creators worldwide.
+            </small>
+
+        </div>
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <h2>1M+</h2>
+                <p>Premium Prompts</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>10,000+</h2>
+                <p>Prompts Saved & Reused</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>200K+</h2>
+                <p>Happy Users</p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+
+
+
+
+
+    <section class="comparison-section">
+
+        <div class="compare-card">
+            <h2>Without Prompt</h2>
+            <div class="line red"></div>
+
+            <img src="too.png" alt="">
+
+            <p>
+                Random prompts produce inconsistent,
+                low-quality results.
+            </p>
+        </div>
+
+        <div class="compare-card">
+            <h2>With Prompt</h2>
+            <div class="line blue"></div>
+
+            <img src="too1.png" alt="">
+
+            <p>
+                Well-structured prompts generate
+                accurate and professional output.
+            </p>
+        </div>
+
+        <div class="compare-card">
+            <h2>result</h2>
+            <div class="line green"></div>
+
+            <img src="too2.png" alt="">
+
+            <p>
+                Better prompts save time,
+                improve quality and increase revenue.
+            </p>
+        </div>
+
+    </section>
+
+    <!-- ================= Pricing (from admin) ================= -->
+    <section class="pricing-page" id="pricing">
+        <div class="pricing_1">
+            <div class="responsive-container-block big-container">
+                <div class="responsive-container-block container">
+                    <p class="text-blk head">Pricing</p>
+                    <p class="text-blk subhead">Live plans and prices from admin. Choose what fits your workflow.</p>
+
+                    <div class="responsive-container-block swiping-box">
+                        <div class="text-center witch switch-text">
+                            <span>Monthly</span>
+                            <div class="switch">
+                                <input type="checkbox" id="billingToggleHome" aria-label="Toggle yearly billing">
+                                <span class="slider round"></span>
+                            </div>
+                            <span>Yearly</span>
+                        </div>
+                    </div>
+
+                    <p id="pricingStatus" class="text-blk subhead" style="text-align:center;">Loading plans...</p>
+                    <div id="pricingCards" class="responsive-container-block card-container"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================
+        FOOTER
+========================= -->
+
+    <footer class="footer">
+
+        <div class="footer-container">
+
+            <!-- Logo -->
+
+            <div class="footer-col">
+
+                <img src="images/logo.png" class="footer-logo" alt="Prompt Jump">
+
+                <p>
+                    Discover premium AI prompts for ChatGPT,
+                    Midjourney, Kling, Runway, Images, Videos,
+                    UI Design, SEO, Coding and much more.
+                </p>
+
+            </div>
+
+            <!-- Links -->
+
+            <div class="footer-col">
+
+                <h3>Quick Links</h3>
+
+                <ul>
+
+                    <li><a href="index.html">Home</a></li>
+
+                    <li><a href="/explore.html">Explore</a></li>
+
+                    <li><a href="#">Categories</a></li>
+
+                    <li><a href="pricing.html">Pricing</a></li>
+
+                    <li><a href="about.html">About</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- Categories -->
+
+            <div class="footer-col">
+
+                <h3>Categories</h3>
+
+                <ul>
+
+                    <li><a href="#">AI Images</a></li>
+
+                    <li><a href="#">AI Videos</a></li>
+
+                    <li><a href="#">ChatGPT</a></li>
+
+                    <li><a href="#">UI / UX</a></li>
+
+                    <li><a href="#">SEO</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- Newsletter -->
+
+            <div class="footer-col">
+
+                <h3>Newsletter</h3>
+
+                <p>
+                    Get the latest premium prompts delivered to your inbox.
+                </p>
+
+                <form>
+
+                    <input type="email" placeholder="Enter your email">
+
+                    <button>
+                        Subscribe
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+
+            <p>
+                © 2026 PromptGenie. All Rights Reserved.
+            </p>
+
+            <div class="social">
+
+                <a href="#">Instagram</a>
+
+                <a href="#">Twitter</a>
+
+                <a href="#">LinkedIn</a>
+
+                <a href="#">YouTube</a>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- =========================
+       GSAP CDN — ONLY ONCE
+  ========================= -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- Your animation logic -->
+    <script src="script.js"></script>
+    <script src="pricing.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pastel Signup</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="signup.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<body class="signup-body">
+
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar" class="mobile-sidebar" aria-hidden="true">
+        <button type="button" class="mobile-sidebar-close" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
+        <nav class="mobile-sidebar-nav">
+            <a href="index.html">Home</a>
+            <a href="explore.html">Explore</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="about.html">About</a>
+        </nav>
+        <div class="mobile-sidebar-actions">
+            <a href="login.html">Login</a>
+            <a href="signup.html" class="mobile-sidebar-cta">Start Free Trial</a>
+        </div>
+    </div>
+    <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileNav()"></div>
+
+    <!-- Navigation Bar -->
+    <header>
+        <nav class="navbar">
+
+            <!-- Logo -->
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/logo.png" alt="Prompt Jump">
+                </a>
+            </div>
+
+            <!-- Center Menu -->
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="explore.html">Explore</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+
+            <!-- Right Side -->
+            <div class="nav-right">
+                <a href="login.html" class="login">Login</a>
+                <a href="signup.html" class="trial-btn">Start Free Trial</a>
+            </div>
+
+            <button type="button" class="mobile-menu-btn" onclick="openMobileNav()" aria-label="Open menu">&#9776;</button>
+
+        </nav>
+    </header>
+
+<div class="container">
+
+    <div class="left">
+
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logo.png" alt="Prompt Jump" class="left-logo">
+            </a>
+        </div>
+
+        <div class="review">
+
+            <div class="stars">★★★★★</div>
+
+            <h2>The missing link between client and builder!</h2>
+
+            <p>
+                Impeccable experience. Super smooth and couldn't be simpler
+                to integrate into your project feedback workflow.
+                Trello export was the cherry on top.
+            </p>
+
+            <h4>Rhett Butler</h4>
+
+        </div>
+
+    </div>
+
+    <div class="right">
+
+        <div class="form-box">
+
+            <div class="users">
+                <img src="https://i.pravatar.cc/150?img=12">
+                <img src="https://i.pravatar.cc/150?img=13">
+                <img src="https://i.pravatar.cc/150?img=15">
+            </div>
+
+            <h1>Happy Tuesday!</h1>
+
+            <p class="subtitle">
+                We're excited to show you how Pastel can simplify and
+                speed up how you gather feedback.
+            </p>
+
+            <form id="signupForm" class="auth-form">
+            <div class="input-group">
+                <i class="fa-regular fa-envelope"></i>
+                <input name="email" type="email" placeholder="Email" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fa-regular fa-user"></i>
+                <input name="fullName" type="text" placeholder="Full Name" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                <input id="password" name="password" type="password" placeholder="Password" minlength="6" required>
+
+                <i class="fa-regular fa-eye eye"
+                onclick="togglePassword()"></i>
+            </div>
+
+            <p class="agree">
+                I agree to the
+                <a href="#">Privacy Policy</a>
+                and
+                <a href="#">Terms of Service</a>
+            </p>
+
+            <p class="auth-message" aria-live="polite"></p>
+
+            <button class="signup-btn" type="submit">
+                Sign Up
+            </button>
+            </form>
+
+            <div class="divider">
+                <span>or continue with</span>
+            </div>
+
+            <div class="social">
+
+                <button class="google">
+                    <i class="fab fa-google"></i>
+                    Sign up with Google
+                </button>
+
+                <button class="facebook">
+                    <i class="fab fa-facebook"></i>
+                    Sign up with Facebook
+                </button>
+
+            </div>
+
+            <div class="bottom">
+                <a href="login.html">Already have an account? Log In</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+<script src="auth.js"></script>
+<script src="mobile-nav.js"></script>
+
+</body>
+</html>

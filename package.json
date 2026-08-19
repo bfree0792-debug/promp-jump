@@ -1,0 +1,17 @@
+{
+  "name": "cope-prompt-4",
+  "version": "1.0.0",
+  "description": "PromptJump Platform",
+  "main": "index.js",
+  "scripts": {
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm start",
+    "dev:user": "cd user-panel && npm run dev",
+    "dev:admin": "cd admin && npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "json": "^11.0.0"
+  }
+}
