@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:4000";
+const API_BASE_URL = "https://promp-jump-6.onrender.com";
 let googleClientId = "";
 let googleTokenClient = null;
 
