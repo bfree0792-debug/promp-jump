@@ -4,7 +4,7 @@ const path = require("path");
 
 const root = path.join(__dirname, "cope prompt3");
 const port = Number(process.env.PORT || 3000);
-const apiTarget = process.env.API_URL || "http://localhost:4000";
+const apiTarget = process.env.API_URL || "https://promp-jump-6.onrender.com";
 
 const types = {
   ".css": "text/css; charset=utf-8",
