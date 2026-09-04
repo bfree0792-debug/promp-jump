@@ -16,6 +16,113 @@ function promptMedia(prompt) {
   return mediaUrl(prompt.thumbnail || prompt.mediaUrl);
 }
 
+export function LandscapePromptCard({ prompt, onOpen }) {
+  const { isSaved, isLiked, toggleSave, toggleLike, copyPromptText } = useLibrary();
+  const isVideo = prompt.type === "Video" || (prompt.mediaUrl && /\.(mp4|webm|mov|ogg)$/i.test(prompt.mediaUrl));
+  const media = promptMedia(prompt);
+  const saved = isSaved(prompt.id);
+  const liked = isLiked(prompt.id);
+
+  return (
+    <div className="group relative w-full aspect-video rounded-2xl overflow-hidden bg-slate-900 shadow-sm hover:shadow-lg transition-all duration-300">
+      <button
+        type="button"
+        onClick={() => onOpen?.(prompt)}
+        className="absolute inset-0 w-full h-full block text-left"
+      >
+        {isVideo ? (
+          <video
+            src={media}
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            muted
+            loop
+            onMouseEnter={(e) => { e.currentTarget.play().catch(() => {}); }}
+            onMouseLeave={(e) => { e.currentTarget.pause(); }}
+          />
+        ) : (
+          <img
+            src={media}
+            alt={prompt.title}
+            onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }}
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        )}
+
+        {/* Top Badges */}
+        <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none z-10">
+          <span className="bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow">
+            <Play size={10} className="fill-white" />
+            {prompt.category || "Video AI"}
+          </span>
+          <span className="bg-amber-500/90 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow">
+            <Crown size={11} />
+            {prompt.access}
+          </span>
+        </div>
+
+        {/* Play Icon overlay */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-11 h-11 bg-black/40 backdrop-blur-sm group-hover:bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg transition-all transform group-hover:scale-110">
+            <Play size={18} className="fill-white ml-0.5" />
+          </div>
+        </div>
+      </button>
+
+      {/* Bottom info and actions bar */}
+      <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/90 via-black/55 to-transparent flex items-center justify-between gap-2 z-20">
+        <div className="min-w-0 flex-1 pr-1">
+          <p className="text-xs sm:text-sm font-semibold text-white truncate drop-shadow-sm">
+            {prompt.title}
+          </p>
+          <p className="text-[11px] text-slate-300 truncate opacity-80">
+            {prompt.description || "16:9 AI Video Prompt"}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSave(prompt.id);
+            }}
+            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-colors ${
+              saved ? "bg-indigo-600 text-white" : "bg-white/20 text-white hover:bg-white/30"
+            }`}
+            title="Save"
+          >
+            <Bookmark size={13} fill={saved ? "currentColor" : "none"} />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleLike(prompt.id);
+            }}
+            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-colors ${
+              liked ? "bg-rose-600 text-white" : "bg-white/20 text-white hover:bg-white/30"
+            }`}
+            title="Like"
+          >
+            <Heart size={13} fill={liked ? "currentColor" : "none"} />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              copyPromptText(prompt.id, prompt.description || prompt.title);
+            }}
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-white/20 text-white hover:bg-white/30 backdrop-blur-md transition-colors"
+            title="Copy Prompt"
+          >
+            <Download size={13} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function TrendingPromptCard({ prompt, onOpen }) {
   const { isSaved, isLiked, toggleSave, toggleLike, copyPromptText } = useLibrary();
   const isVideo = prompt.type === "Video";
@@ -178,7 +285,7 @@ export function PromptCard({ prompt, onOpen, mediaFit = "cover" }) {
 }
 
 export function PromptModal({ prompt, onClose }) {
-  const { isSaved, isLiked, toggleSave, toggleLike, copyPromptText, recordHistory } = useLibrary();
+  const { isSaved, isLiked, toggleSave, toggleLike, copyPromptText, recordHistory, usage, user } = useLibrary();
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -191,11 +298,19 @@ export function PromptModal({ prompt, onClose }) {
   const media = mediaUrl(prompt.mediaUrl || prompt.thumbnail);
   const saved = isSaved(prompt.id);
   const liked = isLiked(prompt.id);
+  const currentUsage = usage?.usage || user?.usage || user?.dailyUsage || {};
+  const limits = usage?.limits || user?.usage?.limits || {};
+  const promptLimitKey = isVideo ? "videoCopies" : "imageCopies";
+  const limitValue = limits[promptLimitKey] ?? limits[isVideo ? "dailyVideoCopies" : "dailyImageCopies"] ?? null;
+  const usedValue = currentUsage[promptLimitKey] ?? currentUsage[isVideo ? "videoCopies" : "imageCopies"] ?? 0;
+  const limitReached = limitValue !== null && usedValue >= limitValue;
 
   async function handleDownloadCopy() {
-    await copyPromptText(prompt.id, prompt.description || prompt.title);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1500);
+    const result = await copyPromptText(prompt.id, prompt.description || prompt.title);
+    if (!result?.error) {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    }
   }
 
   return (
@@ -209,16 +324,45 @@ export function PromptModal({ prompt, onClose }) {
           <X size={18} />
         </button>
 
-        <div className="bg-slate-950">
-          {isVideo ? (
-            <video src={media} controls className="w-full max-h-[70vh] object-contain mx-auto" />
+        <div className="bg-slate-950 relative overflow-hidden">
+          {limitReached ? (
+            <div className="relative">
+              <div className="absolute inset-0 bg-slate-950/75 z-10" />
+              {isVideo ? (
+                <video
+                  src={media}
+                  controls
+                  className="w-full max-h-[70vh] object-contain mx-auto blur-2xl grayscale opacity-60"
+                />
+              ) : (
+                <img
+                  src={media}
+                  alt={prompt.title}
+                  onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }}
+                  className="w-full max-h-[70vh] object-contain mx-auto blur-2xl grayscale opacity-60"
+                />
+              )}
+              <div className="absolute inset-0 z-20 flex items-center justify-center px-4">
+                <div className="max-w-md rounded-2xl border border-red-200 bg-white/95 p-5 text-center shadow-xl">
+                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-600">Plan limit reached</p>
+                  <p className="mt-3 text-base font-semibold text-slate-900">Please update your plan to continue.</p>
+                  <p className="mt-2 text-sm text-slate-600">You can’t view the full image or prompt details until your daily limit resets or your plan is upgraded.</p>
+                </div>
+              </div>
+            </div>
           ) : (
-            <img
-              src={media}
-              alt={prompt.title}
-              onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }}
-              className="w-full max-h-[70vh] object-contain mx-auto"
-            />
+            <>
+              {isVideo ? (
+                <video src={media} controls className="w-full max-h-[70vh] object-contain mx-auto" />
+              ) : (
+                <img
+                  src={media}
+                  alt={prompt.title}
+                  onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }}
+                  className="w-full max-h-[70vh] object-contain mx-auto"
+                />
+              )}
+            </>
           )}
         </div>
 
@@ -255,7 +399,12 @@ export function PromptModal({ prompt, onClose }) {
               </button>
               <button
                 onClick={handleDownloadCopy}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800"
+                disabled={limitReached}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold ${
+                  limitReached
+                    ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                    : "bg-slate-900 text-white hover:bg-slate-800"
+                }`}
               >
                 <Download size={15} />
                 {copied ? "Copied!" : "Download"}
@@ -267,9 +416,15 @@ export function PromptModal({ prompt, onClose }) {
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">
               Prompt / Description
             </p>
-            <p className="text-sm text-slate-700 whitespace-pre-wrap">
-              {prompt.description || "No description provided."}
-            </p>
+            {limitReached ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                Daily limit reached. Please update your plan to continue.
+              </div>
+            ) : (
+              <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                {prompt.description || "No description provided."}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -279,6 +434,34 @@ export function PromptModal({ prompt, onClose }) {
 
 export const PORTRAIT_CARD_CLASS =
   "w-[180px] sm:w-[210px] md:w-[240px] lg:w-[260px] shrink-0";
+
+export const LANDSCAPE_CARD_CLASS =
+  "w-[280px] sm:w-[320px] md:w-[360px] shrink-0";
+
+export function LandscapePromptGrid({ prompts, emptyText }) {
+  const [selected, setSelected] = useState(null);
+
+  if (!prompts?.length) {
+    return (
+      <div className="bg-white border border-slate-200 rounded-xl p-8 text-center text-sm text-slate-500">
+        {emptyText || "No video prompts yet."}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {prompts.map((prompt) => (
+          <div key={prompt.id} className="w-full">
+            <LandscapePromptCard prompt={prompt} onOpen={setSelected} />
+          </div>
+        ))}
+      </div>
+      <PromptModal prompt={selected} onClose={() => setSelected(null)} />
+    </>
+  );
+}
 
 export function PortraitPromptGrid({ prompts, emptyText }) {
   const [selected, setSelected] = useState(null);

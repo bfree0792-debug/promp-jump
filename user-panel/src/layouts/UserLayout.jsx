@@ -243,7 +243,7 @@ export default function UserLayout() {
             )}
           </form>
 
-          <button onClick={handleLogout} className="flex items-center gap-2 pl-1 ml-auto shrink-0">
+          <div className="flex items-center gap-2 ml-auto shrink-0">
             {avatarSrc ? (
               <img
                 src={avatarSrc}
@@ -263,8 +263,15 @@ export default function UserLayout() {
                 {profile?.subscription || "Free"}
               </div>
             </div>
-            <ChevronDown size={15} className="hidden sm:block text-slate-400" />
-          </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Log out"
+              className="ml-1 px-2.5 py-1.5 rounded-md border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-red-600 hover:border-red-200 hover:bg-red-50 dark:hover:text-red-400 dark:hover:border-red-900 dark:hover:bg-red-950/30 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
         </header>
 
         <main className="px-4 sm:px-6 lg:px-8 py-5 sm:py-6">

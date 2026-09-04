@@ -91,42 +91,25 @@
         </div>
     </section>
 
-    <!-- ================= Explore Controls Bar ================= -->
-    <div class="explore-controls-bar">
-        <div class="explore-results-count">
-            Showing <span id="resultsCount">12</span> Prompts
-        </div>
-        <div>
-            <select class="explore-sort-select" id="sortSelect">
-                <option value="trending">🔥 Sort: Trending</option>
-                <option value="popular">⭐ Sort: Most Popular</option>
-                <option value="newest">✨ Sort: Newest</option>
-            </select>
-        </div>
-    </div>
-
     <!-- ================= Explore Prompt Grid ================= -->
     <section class="explore-grid-section">
         <div class="explore-prompt-grid" id="promptGrid">
 
             <!-- Card 1 -->
-            <div class="explore-card" data-category="Midjourney" data-title="Hyper-realistic Cyberpunk Neon Street" data-model="Midjourney v6" data-prompt="A high-octane cyberpunk metropolis at night, rain-slicked streets reflecting vibrant neon signs in pink and teal, volumetric fog, photorealistic, 8k resolution, shot on 35mm lens --ar 16:9 --v 6.0 --style raw" data-rating="4.9" data-copies="4.8k" data-media="image1.png" data-type="image">
+            <div class="explore-card" data-category="Midjourney" data-title="YouTube Thumbnail Prompt" data-model="Midjourney v6" data-prompt="Dark cinematic YouTube thumbnail, black/red/white palette, mystery documentary style, dramatic subject, conspiracy visuals, bold headline, gritty texture, high contrast, shocking and clickable, 16:9." data-rating="4.9" data-copies="4.8k" data-media="image1.png" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">Midjourney v6</span>
-                    <img src="image1.png" alt="Cyberpunk Neon Street">
+                    <img src="img1.png" alt="YouTube Thumbnail Prompt">
                 </div>
                 <div class="explore-card-body">
-                    <h3 class="explore-card-title">Hyper-realistic Cyberpunk Neon Street</h3>
+                    <h3 class="explore-card-title">YouTube Thumbnail Prompt</h3>
                     <div class="explore-card-prompt">
-                        A high-octane cyberpunk metropolis at night, rain-slicked streets reflecting vibrant neon signs in pink and teal...
+                        Dark cinematic YouTube thumbnail, black/red/white palette, mystery documentary style, dramatic subject, conspiracy visuals, bold headline, gritty texture, high contrast, shocking and clickable, 16:9.
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 4.9</span>
-                            <span>•</span>
                             <span>4.8k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('A high-octane cyberpunk metropolis at night, rain-slicked streets reflecting vibrant neon signs in pink and teal, volumetric fog, photorealistic, 8k resolution, shot on 35mm lens --ar 16:9 --v 6.0 --style raw')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -136,8 +119,7 @@
             <!-- Card 2 -->
             <div class="explore-card" data-category="AI Video" data-title="Cinematic Mountain Drone Footage" data-model="Runway Gen-3" data-prompt="Fading sunset over jagged snow-capped alpine peaks, cinematic FPV drone sweeping fast through misty valleys, golden hour lighting, hyper-realistic physics, 4k 60fps" data-rating="5.0" data-copies="3.2k" data-media="video1.mp4" data-type="video">
                 <div class="explore-card-media">
-                    <span class="model-badge">Runway Gen-3</span>
-                    <video src="video1.mp4" autoplay muted loop playsinline></video>
+                    <img src="image22.png" alt="Cinematic Mountain Drone Footage">
                 </div>
                 <div class="explore-card-body">
                     <h3 class="explore-card-title">Cinematic Mountain Drone Footage</h3>
@@ -146,11 +128,9 @@
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 5.0</span>
-                            <span>•</span>
                             <span>3.2k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('Fading sunset over jagged snow-capped alpine peaks, cinematic FPV drone sweeping fast through misty valleys, golden hour lighting, hyper-realistic physics, 4k 60fps')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -160,8 +140,7 @@
             <!-- Card 3 -->
             <div class="explore-card" data-category="ChatGPT" data-title="Viral SaaS Hero Section Copywriter" data-model="ChatGPT-4o" data-prompt="Act as a world-class conversion copywriting expert. Draft 3 compelling hero section headlines and value propositions for an AI automation platform targeting B2B founders." data-rating="4.8" data-copies="5.1k" data-media="image33.png" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">ChatGPT-4o</span>
-                    <img src="image33.png" alt="SaaS Hero Copywriter">
+                    <img src="imag33.png" alt="SaaS Hero Copywriter">
                 </div>
                 <div class="explore-card-body">
                     <h3 class="explore-card-title">Viral SaaS Hero Section Copywriter</h3>
@@ -170,11 +149,9 @@
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 4.8</span>
-                            <span>•</span>
                             <span>5.1k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('Act as a world-class conversion copywriting expert. Draft 3 compelling hero section headlines and value propositions for an AI automation platform targeting B2B founders.')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -184,8 +161,7 @@
             <!-- Card 4 -->
             <div class="explore-card" data-category="UI/UX Design" data-title="3D Glassmorphism App Icon Pack" data-model="Midjourney v6" data-prompt="Minimalist 3D app icon of a glowing crystal orb, smooth matte glassmorphism style, soft pastel gradients, volumetric lighting, isolated on dark backdrop --ar 1:1 --v 6.0" data-rating="4.9" data-copies="6.7k" data-media="image44.png" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">Midjourney v6</span>
-                    <img src="image44.png" alt="3D Glassmorphism App Icon">
+                    <img src="image44.jpg" alt="3D Glassmorphism App Icon">
                 </div>
                 <div class="explore-card-body">
                     <h3 class="explore-card-title">3D Glassmorphism App Icon Pack</h3>
@@ -194,11 +170,9 @@
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 4.9</span>
-                            <span>•</span>
                             <span>6.7k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('Minimalist 3D app icon of a glowing crystal orb, smooth matte glassmorphism style, soft pastel gradients, volumetric lighting, isolated on dark backdrop --ar 1:1 --v 6.0')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -206,23 +180,20 @@
             </div>
 
             <!-- Card 5 -->
-            <div class="explore-card" data-category="SEO & Copywriting" data-title="High-Converting SEO Article Generator" data-model="ChatGPT-4o" data-prompt="Generate a comprehensive 2000-word SEO optimized guide on 'Future of Generative AI in 2026'. Include H2/H3 headings, meta title, meta description, and FAQ section." data-rating="4.7" data-copies="2.1k" data-media="image15.png" data-type="image">
+            <div class="explore-card" data-category="Coding & Tech" data-title="Claude Prompt Pack" data-model="Claude 3.5" data-prompt="A collection of ready-to-use Claude prompts and templates to create, automate, scale, and grow faster." data-rating="4.7" data-copies="2.1k" data-media="image15.png" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">ChatGPT-4o</span>
-                    <img src="image15.png" alt="SEO Generator">
+                    <img src="image15.png" alt="Claude Prompt Pack">
                 </div>
                 <div class="explore-card-body">
-                    <h3 class="explore-card-title">High-Converting SEO Article Generator</h3>
+                    <h3 class="explore-card-title">Claude Prompt Pack</h3>
                     <div class="explore-card-prompt">
-                        Generate a comprehensive 2000-word SEO optimized guide on 'Future of Generative AI in 2026'...
+                        A collection of ready-to-use Claude prompts and templates to create, automate, scale, and grow faster.
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 4.7</span>
-                            <span>•</span>
                             <span>2.1k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('Generate a comprehensive 2000-word SEO optimized guide on Future of Generative AI in 2026. Include H2/H3 headings, meta title, meta description, and FAQ section.')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -230,23 +201,20 @@
             </div>
 
             <!-- Card 6 -->
-            <div class="explore-card" data-category="AI Video" data-title="Futuristic Sports Car Drift" data-model="Kling AI" data-prompt="Sleek obsidian super car drifting around a sharp coastal cliff bend, smoke billowing from tires, cinematic slow-motion lens flare, ultra-high resolution" data-rating="5.0" data-copies="7.4k" data-media="project1.mp4" data-type="video">
+            <div class="explore-card" data-category="ChatGPT" data-title="Top 10 ATS Resume Prompts" data-model="ChatGPT-4o" data-prompt="Create an ATS-friendly resume, optimize keywords, improve formatting, and increase your chances of getting shortlisted and hired." data-rating="5.0" data-copies="7.4k" data-media="project1.mp4" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">Kling AI</span>
-                    <video src="project1.mp4" autoplay muted loop playsinline></video>
+                    <img src="imag6.png" alt="Top 10 ATS Resume Prompts">
                 </div>
                 <div class="explore-card-body">
-                    <h3 class="explore-card-title">Futuristic Sports Car Drift</h3>
+                    <h3 class="explore-card-title">Top 10 ATS Resume Prompts</h3>
                     <div class="explore-card-prompt">
-                        Sleek obsidian super car drifting around a sharp coastal cliff bend, smoke billowing from tires...
+                        Create an ATS-friendly resume, optimize keywords, improve formatting, and increase your chances of getting shortlisted and hired.
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 5.0</span>
-                            <span>•</span>
                             <span>7.4k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('Sleek obsidian super car drifting around a sharp coastal cliff bend, smoke billowing from tires, cinematic slow-motion lens flare, ultra-high resolution')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -254,23 +222,20 @@
             </div>
 
             <!-- Card 7 -->
-            <div class="explore-card" data-category="Coding & Tech" data-title="Clean React & Tailwind Dashboard" data-model="Claude 3.5" data-prompt="Write a modern, fully responsive React component using Tailwind CSS for an analytics dashboard overview with sparkline charts, KPI summary cards, and dark mode toggle." data-rating="4.9" data-copies="4.3k" data-media="image66.png" data-type="image">
+            <div class="explore-card" data-category="Midjourney" data-title="Transform Your Photo into a Disney Character" data-model="Midjourney v6" data-prompt="Turn your photo into a charming cartoon character with expressive eyes, soft facial features, smooth details, and a polished animated look." data-rating="4.9" data-copies="4.3k" data-media="image66.png" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">Claude 3.5</span>
-                    <img src="image66.png" alt="React Dashboard">
+                    <img src="imag7.png" alt="Transform Your Photo into a Disney Character">
                 </div>
                 <div class="explore-card-body">
-                    <h3 class="explore-card-title">Clean React & Tailwind Dashboard</h3>
+                    <h3 class="explore-card-title">Transform Your Photo into a Disney Character</h3>
                     <div class="explore-card-prompt">
-                        Write a modern, fully responsive React component using Tailwind CSS for an analytics dashboard...
+                        Turn your photo into a charming cartoon character with expressive eyes, soft facial features, smooth details, and a polished animated look.
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 4.9</span>
-                            <span>•</span>
                             <span>4.3k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('Write a modern, fully responsive React component using Tailwind CSS for an analytics dashboard overview with sparkline charts, KPI summary cards, and dark mode toggle.')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -278,23 +243,20 @@
             </div>
 
             <!-- Card 8 -->
-            <div class="explore-card" data-category="Midjourney" data-title="Surreal Dreamscape Fantasy Portal" data-model="DALL-E 3" data-prompt="A luminous ethereal portal hovering above a mirror-like ocean reflecting glowing constellations, vibrant fantasy colors, ultra-detailed digital art style." data-rating="4.8" data-copies="3.9k" data-media="image77.png" data-type="image">
+            <div class="explore-card" data-category="ChatGPT" data-title="15 ChatGPT Prompts for Email Marketing" data-model="ChatGPT-4o" data-prompt="Create engaging emails faster with prompts for welcome campaigns, promotions, newsletters, product launches, follow-ups, and re-engagement." data-rating="4.8" data-copies="3.9k" data-media="image77.png" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">DALL-E 3</span>
-                    <img src="image77.png" alt="Fantasy Portal">
+                    <img src="image78.png" alt="15 ChatGPT Prompts for Email Marketing">
                 </div>
                 <div class="explore-card-body">
-                    <h3 class="explore-card-title">Surreal Dreamscape Fantasy Portal</h3>
+                    <h3 class="explore-card-title">15 ChatGPT Prompts for Email Marketing</h3>
                     <div class="explore-card-prompt">
-                        A luminous ethereal portal hovering above a mirror-like ocean reflecting glowing constellations...
+                        Create engaging emails faster with prompts for welcome campaigns, promotions, newsletters, product launches, follow-ups, and re-engagement.
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 4.8</span>
-                            <span>•</span>
                             <span>3.9k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('A luminous ethereal portal hovering above a mirror-like ocean reflecting glowing constellations, vibrant fantasy colors, ultra-detailed digital art style.')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -304,8 +266,7 @@
             <!-- Card 9 -->
             <div class="explore-card" data-category="Marketing" data-title="Instagram Reel Viral Hook Script" data-model="ChatGPT-4o" data-prompt="Create a 30-second viral Instagram Reel script selling a productivity app. Include visual camera cues, text-on-screen overlay specs, and high-converting CTA." data-rating="4.9" data-copies="1.8k" data-media="image8.png" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">ChatGPT-4o</span>
-                    <img src="image8.png" alt="Instagram Reel Hook">
+                    <img src="imag8.png" alt="Instagram Reel Hook">
                 </div>
                 <div class="explore-card-body">
                     <h3 class="explore-card-title">Instagram Reel Viral Hook Script</h3>
@@ -314,11 +275,9 @@
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 4.9</span>
-                            <span>•</span>
                             <span>1.8k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('Create a 30-second viral Instagram Reel script selling a productivity app. Include visual camera cues, text-on-screen overlay specs, and high-converting CTA.')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -326,23 +285,20 @@
             </div>
 
             <!-- Card 10 -->
-            <div class="explore-card" data-category="Midjourney" data-title="Cyberpunk Anime Character Portrait" data-model="Flux.1 Dev" data-prompt="A striking anime character portrait with glowing cybernetic implants, wearing a tactical streetwear jacket under heavy rain, neon lights bokeh --ar 3:4" data-rating="5.0" data-copies="8.9k" data-media="image9.png" data-type="image">
+            <div class="explore-card" data-category="AI Video" data-title="20 Camera Angles Cheat Sheet" data-model="Runway Gen-3" data-prompt="Master 20 essential camera angles and shot types—from bird's-eye and low angles to close-ups and Dutch tilts—to create more dynamic and cinematic visuals." data-rating="5.0" data-copies="8.9k" data-media="image9.png" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">Flux.1 Dev</span>
-                    <img src="image9.png" alt="Cyberpunk Anime Portrait">
+                    <img src="imag9.png" alt="20 Camera Angles Cheat Sheet">
                 </div>
                 <div class="explore-card-body">
-                    <h3 class="explore-card-title">Cyberpunk Anime Character Portrait</h3>
+                    <h3 class="explore-card-title">20 Camera Angles Cheat Sheet</h3>
                     <div class="explore-card-prompt">
-                        A striking anime character portrait with glowing cybernetic implants, wearing a tactical streetwear jacket...
+                        Master 20 essential camera angles and shot types—from bird's-eye and low angles to close-ups and Dutch tilts—to create more dynamic and cinematic visuals.
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 5.0</span>
-                            <span>•</span>
                             <span>8.9k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('A striking anime character portrait with glowing cybernetic implants, wearing a tactical streetwear jacket under heavy rain, neon lights bokeh --ar 3:4')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -352,8 +308,7 @@
             <!-- Card 11 -->
             <div class="explore-card" data-category="UI/UX Design" data-title="Isometric Smart City 3D Render" data-model="Midjourney v6" data-prompt="Isometric 3D render of a futuristic green smart city with flying solar vehicles, lush rooftop gardens, holographic displays, soft studio lighting --ar 16:9" data-rating="4.8" data-copies="2.9k" data-media="image10.png" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">Midjourney v6</span>
-                    <img src="image10.png" alt="Isometric Smart City">
+                    <img src="imag10.png" alt="Isometric Smart City">
                 </div>
                 <div class="explore-card-body">
                     <h3 class="explore-card-title">Isometric Smart City 3D Render</h3>
@@ -362,11 +317,9 @@
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 4.8</span>
-                            <span>•</span>
                             <span>2.9k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('Isometric 3D render of a futuristic green smart city with flying solar vehicles, lush rooftop gardens, holographic displays, soft studio lighting --ar 16:9')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -374,23 +327,20 @@
             </div>
 
             <!-- Card 12 -->
-            <div class="explore-card" data-category="UI/UX Design" data-title="Abstract Liquid Gradient Background" data-model="Stable Diffusion" data-prompt="Abstract dynamic flowing liquid silk ribbon, vibrant iridescent violet and coral colors, high gloss reflection, 8k wallpaper resolution" data-rating="4.9" data-copies="3.5k" data-media="image2.png" data-type="image">
+            <div class="explore-card" data-category="ChatGPT" data-title="ChatGPT Prompts for Product Descriptions" data-model="ChatGPT-4o" data-prompt="Create compelling, customer-focused product descriptions that turn features into benefits, improve conversions, and make your products stand out." data-rating="4.9" data-copies="3.5k" data-media="image2.png" data-type="image">
                 <div class="explore-card-media">
-                    <span class="model-badge">Stable Diffusion</span>
-                    <img src="image2.png" alt="Liquid Gradient Background">
+                    <img src="imag11.png" alt="ChatGPT Prompts for Product Descriptions">
                 </div>
                 <div class="explore-card-body">
-                    <h3 class="explore-card-title">Abstract Liquid Gradient Background</h3>
+                    <h3 class="explore-card-title">ChatGPT Prompts for Product Descriptions</h3>
                     <div class="explore-card-prompt">
-                        Abstract dynamic flowing liquid silk ribbon, vibrant iridescent violet and coral colors, high gloss reflection...
+                        Create compelling, customer-focused product descriptions that turn features into benefits, improve conversions, and make your products stand out.
                     </div>
                     <div class="explore-card-meta">
                         <div class="explore-card-stats">
-                            <span class="rating">⭐ 4.9</span>
-                            <span>•</span>
                             <span>3.5k copies</span>
                         </div>
-                        <button class="copy-prompt-btn" onclick="event.stopPropagation(); copyText('Abstract dynamic flowing liquid silk ribbon, vibrant iridescent violet and coral colors, high gloss reflection, 8k wallpaper resolution')">
+                        <button class="copy-prompt-btn" type="button">
                             📋 Copy
                         </button>
                     </div>
@@ -400,175 +350,17 @@
         </div>
     </section>
 
-    <!-- ================= Modal Overlay ================= -->
-    <div class="modal-overlay" id="promptModal">
-        <div class="modal-container">
-            <button class="modal-close-btn" id="modalClose">&times;</button>
-            <div class="modal-body">
-                <div class="modal-media-wrapper" id="modalMediaContainer">
-                    <img src="" id="modalImage" alt="Prompt Preview">
-                </div>
-                <div class="modal-details">
-                    <span class="modal-badge" id="modalModelBadge">Midjourney v6</span>
-                    <h2 class="modal-title" id="modalTitle">Prompt Title</h2>
-                    
-                    <div class="modal-section-label">Full Prompt</div>
-                    <div class="modal-prompt-box" id="modalPromptText">Prompt text...</div>
-
-                    <div class="modal-meta-grid">
-                        <div class="modal-meta-item">
-                            <strong>Category</strong>
-                            <span id="modalCategory">Midjourney</span>
-                        </div>
-                        <div class="modal-meta-item">
-                            <strong>Popularity</strong>
-                            <span id="modalRating">⭐ 4.9 (4.8k copies)</span>
-                        </div>
-                    </div>
-
-                    <button class="modal-action-btn" id="modalCopyBtn">
-                        📋 Copy Full Prompt
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast -->
-    <div class="toast-notification" id="toast">
-        🚀 Prompt copied to clipboard!
-    </div>
-
     <!-- ================= GSAP & Script ================= -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="script.js"></script>
     <script>
-        // Copy prompt functionality with toast
-        function copyText(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast("🚀 Prompt copied to clipboard!");
-            }).catch(err => {
-                // Fallback for older browsers
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand("copy");
-                document.body.removeChild(textArea);
-                showToast("🚀 Prompt copied to clipboard!");
+        // Explore section buttons are purely visual (show-off only, no action triggered)
+        document.querySelectorAll('.copy-prompt-btn, .explore-search-btn, .filter-pill, .explore-card').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
             });
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2500);
-        }
-
-        // Filtering and Search Logic
-        const filterPills = document.querySelectorAll('.filter-pill');
-        const cards = document.querySelectorAll('.explore-card');
-        const searchInput = document.getElementById('searchInput');
-        const searchBtn = document.getElementById('searchBtn');
-        const resultsCount = document.getElementById('resultsCount');
-
-        let activeCategory = 'all';
-
-        function filterPrompts() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            let count = 0;
-
-            cards.forEach(card => {
-                const category = card.getAttribute('data-category');
-                const title = card.getAttribute('data-title').toLowerCase();
-                const prompt = card.getAttribute('data-prompt').toLowerCase();
-                const model = card.getAttribute('data-model').toLowerCase();
-
-                const matchesCategory = (activeCategory === 'all' || category === activeCategory);
-                const matchesSearch = !searchTerm || title.includes(searchTerm) || prompt.includes(searchTerm) || model.includes(searchTerm);
-
-                if (matchesCategory && matchesSearch) {
-                    card.style.display = 'flex';
-                    count++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            resultsCount.textContent = count;
-        }
-
-        filterPills.forEach(pill => {
-            pill.addEventListener('click', () => {
-                filterPills.forEach(p => p.classList.remove('active'));
-                pill.classList.add('active');
-                activeCategory = pill.getAttribute('data-category');
-                filterPrompts();
-            });
-        });
-
-        searchInput.addEventListener('input', filterPrompts);
-        searchBtn.addEventListener('click', filterPrompts);
-
-        // Modal handling
-        const modal = document.getElementById('promptModal');
-        const modalClose = document.getElementById('modalClose');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalModelBadge = document.getElementById('modalModelBadge');
-        const modalPromptText = document.getElementById('modalPromptText');
-        const modalCategory = document.getElementById('modalCategory');
-        const modalRating = document.getElementById('modalRating');
-        const modalMediaContainer = document.getElementById('modalMediaContainer');
-        const modalCopyBtn = document.getElementById('modalCopyBtn');
-
-        let currentModalPrompt = '';
-
-        cards.forEach(card => {
-            card.addEventListener('click', () => {
-                const title = card.getAttribute('data-title');
-                const model = card.getAttribute('data-model');
-                const prompt = card.getAttribute('data-prompt');
-                const category = card.getAttribute('data-category');
-                const rating = card.getAttribute('data-rating');
-                const copies = card.getAttribute('data-copies');
-                const mediaSrc = card.getAttribute('data-media');
-                const mediaType = card.getAttribute('data-type');
-
-                modalTitle.textContent = title;
-                modalModelBadge.textContent = model;
-                modalPromptText.textContent = prompt;
-                modalCategory.textContent = category;
-                modalRating.textContent = `⭐ ${rating} (${copies} copies)`;
-                currentModalPrompt = prompt;
-
-                if (mediaType === 'video') {
-                    modalMediaContainer.innerHTML = `<video src="${mediaSrc}" autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;"></video>`;
-                } else {
-                    modalMediaContainer.innerHTML = `<img src="${mediaSrc}" alt="${title}" style="width:100%; height:100%; object-fit:cover;">`;
-                }
-
-                modal.classList.add('active');
-            });
-        });
-
-        modalClose.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('active');
-            }
-        });
-
-        modalCopyBtn.addEventListener('click', () => {
-            if (currentModalPrompt) {
-                copyText(currentModalPrompt);
-            }
         });
     </script>
     <script src="mobile-nav.js"></script>

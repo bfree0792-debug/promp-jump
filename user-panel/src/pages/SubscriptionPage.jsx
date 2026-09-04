@@ -79,9 +79,11 @@ export default function SubscriptionPage() {
     setError("");
     setMessage("");
     setSubscribingId(plan.id);
+
+    const period = isYearly && plan.yearlyPrice != null ? "yearly" : "monthly";
+    const selectedPrice = priceForPeriod(plan, period === "yearly");
+
     try {
-      const period = isYearly && plan.yearlyPrice != null ? "yearly" : "monthly";
-      const selectedPrice = priceForPeriod(plan, period === "yearly");
       await subscribeToPlan({
         ...plan,
         price: selectedPrice,

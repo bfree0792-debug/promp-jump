@@ -80,6 +80,20 @@ export function SettingsProvider({ children }) {
     async (payload) => {
       if (!profile?.id) return null;
 
+      const previousProfile = profile;
+      const previousSettings = settings;
+
+      const optimisticProfile = { ...profile, ...payload };
+      const optimisticSettings = {
+        ...settings,
+        ...(payload.preferences ? { preferences: { ...settings.preferences, ...payload.preferences } } : {}),
+        ...(payload.emailNotifications ? { emailNotifications: { ...settings.emailNotifications, ...payload.emailNotifications } } : {}),
+        ...(payload.appearance ? { appearance: { ...settings.appearance, ...payload.appearance } } : {}),
+      };
+
+      setProfile(optimisticProfile);
+      setSettings(optimisticSettings);
+
       setSaving(true);
       try {
         const updated = await api.updateUserProfile(profile.id, payload);
@@ -87,16 +101,23 @@ export function SettingsProvider({ children }) {
         setSettings(mergeSettings(updated));
         updateStoredUser(updated);
         return updated;
+      } catch (err) {
+        setProfile(previousProfile);
+        setSettings(previousSettings);
+        throw err;
       } finally {
         setSaving(false);
       }
     },
-    [profile?.id]
+    [profile?.id, profile, settings]
   );
 
   const uploadAvatar = useCallback(
     async (file) => {
       if (!profile?.id) return null;
+
+      const previousProfile = profile;
+      const previousSettings = settings;
 
       setSaving(true);
       try {
@@ -105,16 +126,23 @@ export function SettingsProvider({ children }) {
         setSettings(mergeSettings(updated));
         updateStoredUser(updated);
         return updated;
+      } catch (err) {
+        setProfile(previousProfile);
+        setSettings(previousSettings);
+        throw err;
       } finally {
         setSaving(false);
       }
     },
-    [profile?.id]
+    [profile?.id, profile, settings]
   );
 
   const subscribeToPlan = useCallback(
     async (plan) => {
       if (!profile?.id) return null;
+
+      const previousProfile = profile;
+      const previousSettings = settings;
 
       setSaving(true);
       try {
@@ -123,11 +151,15 @@ export function SettingsProvider({ children }) {
         setSettings(mergeSettings(updated));
         updateStoredUser(updated);
         return updated;
+      } catch (err) {
+        setProfile(previousProfile);
+        setSettings(previousSettings);
+        throw err;
       } finally {
         setSaving(false);
       }
     },
-    [profile?.id]
+    [profile?.id, profile, settings]
   );
 
   const updatePreference = useCallback(
@@ -136,8 +168,14 @@ export function SettingsProvider({ children }) {
         ...settings,
         preferences: { ...settings.preferences, [key]: value },
       };
+      const previousSettings = settings;
       setSettings(next);
-      await saveProfile({ preferences: next.preferences });
+      try {
+        await saveProfile({ preferences: next.preferences });
+      } catch (err) {
+        setSettings(previousSettings);
+        throw err;
+      }
     },
     [saveProfile, settings]
   );
@@ -148,8 +186,14 @@ export function SettingsProvider({ children }) {
         ...settings,
         emailNotifications: { ...settings.emailNotifications, [key]: value },
       };
+      const previousSettings = settings;
       setSettings(next);
-      await saveProfile({ emailNotifications: next.emailNotifications });
+      try {
+        await saveProfile({ emailNotifications: next.emailNotifications });
+      } catch (err) {
+        setSettings(previousSettings);
+        throw err;
+      }
     },
     [saveProfile, settings]
   );
@@ -160,9 +204,16 @@ export function SettingsProvider({ children }) {
         ...settings,
         appearance: { theme },
       };
+      const previousSettings = settings;
       setSettings(next);
       applyTheme(theme);
-      await saveProfile({ appearance: next.appearance });
+      try {
+        await saveProfile({ appearance: next.appearance });
+      } catch (err) {
+        setSettings(previousSettings);
+        applyTheme(settings.appearance.theme);
+        throw err;
+      }
     },
     [saveProfile, settings]
   );

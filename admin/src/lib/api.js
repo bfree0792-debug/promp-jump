@@ -1,9 +1,26 @@
+import { getStoredToken, getStoredUser } from "./auth";
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
-async function request(path, options = {}) {  let response;
+async function request(path, options = {}) {
+  let response;
+
+  const headers = { ...(options.headers || {}) };
+  const user = getStoredUser();
+  const token = getStoredToken();
+
+  if (user?.id || user?._id) {
+    headers["x-admin-id"] = user.id || user._id;
+  }
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
 
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, options);
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers,
+    });
   } catch {
     throw new Error(
       "Cannot reach the API. Make sure the backend is running on port 4000."
@@ -107,7 +124,7 @@ export function mediaUrl(path) {
     try {
       const parsed = new URL(path);
       if (parsed.pathname.startsWith("/uploads/")) {
-        return `${API_BASE_URL || "http://localhost:5000"}${parsed.pathname}`;
+        return `${API_BASE_URL}${parsed.pathname}`;
       }
     } catch {
       return path;
@@ -116,7 +133,7 @@ export function mediaUrl(path) {
   }
   const normalized = path.startsWith("/") ? path : `/${path}`;
   if (normalized.startsWith("/uploads/")) {
-    return `${API_BASE_URL || "http://localhost:5000"}${normalized}`;
+    return `${API_BASE_URL}${normalized}`;
   }
   return path;
 }

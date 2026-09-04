@@ -4,6 +4,8 @@ import { LibraryProvider } from "./lib/library";
 import { SettingsProvider } from "./lib/settings";
 import UserLayout from "./layouts/UserLayout";
 import LoginPage from "./pages/LoginPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Dashboard from "./pages/Dashboard";
 import BrowsePage from "./pages/BrowsePage";
 import TrendingPage from "./pages/TrendingPage";
@@ -24,6 +26,8 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route element={<ProtectedRoute />}>
               <Route element={<UserLayout />}>
                 <Route path="/" element={<Dashboard />} />

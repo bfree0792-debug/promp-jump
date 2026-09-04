@@ -1,150 +1,33 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Gauge, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Check, Gauge, Infinity, RefreshCw } from "lucide-react";
 import { api } from "../lib/api";
 import { getStoredUser } from "../lib/auth";
-import { useLibrary } from "../lib/library";
 
-function limitLabel(value) {
-  return value === null || value === undefined ? "Unlimited" : String(value);
-}
+const measures = [
+  ["Image copies", "imageCopies", "dailyImageCopies", "Prompt descriptions copied today"],
+  ["Video copies", "videoCopies", "dailyVideoCopies", "Prompt descriptions copied today"],
+  ["Saved prompts", "saves", "maxSaves", "Prompts kept in your library"],
+  ["Favorites", "favorites", "maxFavorites", "Prompts you have liked"],
+  ["Premium prompts", "premiumPrompts", "premiumPrompts", "Premium/Pro prompts accessed today"],
+];
+const isUnlimited = (limit) => limit === null;
+const value = (input) => Number.isFinite(Number(input)) ? Number(input) : 0;
 
-function StatCard({ label, used, limit, hint }) {
-  const unlimited = limit === null || limit === undefined;
-  const pct = unlimited || !limit ? 0 : Math.min(100, Math.round((used / limit) * 100));
-  const reached = !unlimited && used >= limit;
-
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-slate-900 dark:text-white">{label}</p>
-          {hint && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{hint}</p>}
-        </div>
-        <p className={`text-sm font-bold ${reached ? "text-rose-600" : "text-indigo-600"}`}>
-          {used} / {limitLabel(limit)}
-        </p>
-      </div>
-      {!unlimited && (
-        <div className="mt-3 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-          <div
-            className={`h-full rounded-full ${reached ? "bg-rose-500" : "bg-indigo-500"}`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-      )}
-    </div>
-  );
+function UsageInstrument({ label, used, limit, detail }) {
+  const unlimited = isUnlimited(limit), total = value(limit), percent = unlimited || total <= 0 ? 0 : Math.min(100, Math.round((used / total) * 100));
+  const reached = !unlimited && used >= total, near = !reached && percent >= 80;
+  const color = reached ? "bg-red-500" : near ? "bg-amber-500" : "bg-indigo-600";
+  const tone = reached ? "text-red-600 dark:text-red-400" : near ? "text-amber-700 dark:text-amber-400" : "text-indigo-700 dark:text-indigo-400";
+  return <article className="border-b border-slate-200 py-5 first:pt-0 last:border-b-0 last:pb-0 dark:border-slate-800"><div className="flex items-start justify-between gap-4"><div><h3 className="text-sm font-semibold text-slate-900 dark:text-white">{label}</h3><p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{detail}</p></div>{unlimited ? <span className="inline-flex items-center gap-1 text-sm font-semibold text-slate-600 dark:text-slate-300"><Infinity size={17} /> Unlimited</span> : <span className={`text-sm font-bold tabular-nums ${tone}`}>{used} <span className="font-medium text-slate-400">/ {total}</span></span>}</div>{unlimited ? <p className="mt-4 text-xs font-medium text-slate-500 dark:text-slate-400">No usage cap on this allowance.</p> : <><div className="mt-4 h-1.5 overflow-hidden bg-slate-100 dark:bg-slate-800" aria-label={`${percent}% used`}><div className={`h-full ${color} transition-[width] duration-500`} style={{ width: `${percent}%` }} /></div><p className={`mt-2 text-xs font-medium ${tone}`}>{reached ? "Limit reached" : `${Math.max(0, total - used)} remaining`}</p></>}</article>;
 }
 
 export default function UsagePage() {
   const stored = getStoredUser();
-  const { usage: libraryUsage } = useLibrary();
-  const [usage, setUsage] = useState(libraryUsage || stored?.usage || null);
-  const [loading, setLoading] = useState(!usage);
-
-  useEffect(() => {
-    async function load() {
-      if (!stored?.id) return;
-      setLoading(true);
-      try {
-        const data = await api.getUsage(stored.id);
-        setUsage(data);
-      } catch {
-        setUsage(libraryUsage || stored?.usage || null);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, [stored?.id, libraryUsage]);
-
-  const plan = usage?.plan || stored?.subscription || "Free";
-  const limits = usage?.limits || {};
-  const used = usage?.usage || {};
-
-  return (
-    <div className="flex flex-col gap-6 max-w-3xl">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Gauge className="w-5 h-5 text-indigo-600" />
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
-              Usage & Limits
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Current plan: <span className="font-semibold text-indigo-600">{plan}</span>
-            </p>
-          </div>
-        </div>
-        {plan === "Free" && (
-          <Link
-            to="/subscription"
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
-          >
-            Upgrade
-            <ArrowUpRight size={14} />
-          </Link>
-        )}
-      </div>
-
-      {loading ? (
-        <p className="text-sm text-slate-500">Loading usage...</p>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <StatCard
-              label="Image copies today"
-              used={used.imageCopies || 0}
-              limit={limits.dailyImageCopies}
-              hint="Copy image prompt descriptions"
-            />
-            <StatCard
-              label="Video copies today"
-              used={used.videoCopies || 0}
-              limit={limits.dailyVideoCopies}
-              hint="Copy video prompt descriptions"
-            />
-            <StatCard
-              label="Saved prompts"
-              used={used.saves || 0}
-              limit={limits.maxSaves}
-              hint={limits.savesImagesOnly ? "Free plan: images only" : "Images and videos"}
-            />
-            <StatCard
-              label="Favorites"
-              used={used.favorites || 0}
-              limit={limits.maxFavorites}
-              hint="Liked prompts"
-            />
-          </div>
-
-          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-3">
-              Plan rules
-            </h2>
-            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
-              <li>
-                Content access:{" "}
-                <span className="font-medium">
-                  {(limits.allowedAccess || ["Free"]).join(", ")}
-                </span>
-              </li>
-              <li>History: Unlimited</li>
-              {plan === "Free" && (
-                <>
-                  <li>Daily: 6 image description copies + 4 video description copies</li>
-                  <li>Saves: max 6 image prompts only</li>
-                  <li>Favorites: max 20</li>
-                </>
-              )}
-              {plan !== "Free" && (
-                <li>Paid plan: unlimited copies, saves, and favorites for allowed content.</li>
-              )}
-            </ul>
-          </div>
-        </>
-      )}
-    </div>
-  );
+  const [usage, setUsage] = useState(null), [loading, setLoading] = useState(true), [error, setError] = useState("");
+  useEffect(() => { let active = true; async function load() { if (!stored?.id) { if (active) { setError("Sign in to view your plan usage."); setLoading(false); } return; } setLoading(true); setError(""); try { const data = await api.getUsage(stored.id); if (active) setUsage(data); } catch (err) { if (active) setError(err.message || "Could not load usage."); } finally { if (active) setLoading(false); } } load(); return () => { active = false; }; }, [stored?.id]);
+  const plan = usage?.plan || stored?.billing?.planName || stored?.subscription || "Free", limits = usage?.limits || {};
+  const activeMeasures = useMemo(() => measures.filter(([, , key]) => Object.prototype.hasOwnProperty.call(limits, key)), [limits]);
+  const finiteCount = activeMeasures.filter(([, , key]) => !isUnlimited(limits[key])).length;
+  return <div className="max-w-4xl space-y-7"><header className="border-b border-slate-200 pb-5 dark:border-slate-800"><div className="flex items-start justify-between gap-4"><div><div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400"><Gauge size={19} /><span className="text-xs font-bold uppercase tracking-[0.16em]">Account</span></div><h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-950 dark:text-white">Usage &amp; limits</h1><p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">A clear view of what your active plan includes and how much capacity remains.</p></div>{plan === "Free" && <Link to="/subscription" className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Explore plans <ArrowUpRight size={15} /></Link>}</div></header>{loading ? <div className="border border-slate-200 bg-white p-6 text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900">Loading your plan allowances…</div> : error ? <div className="border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"><p>{error}</p><button onClick={() => window.location.reload()} className="mt-3 inline-flex items-center gap-1 font-semibold underline"><RefreshCw size={14} /> Try again</button></div> : !usage ? <div className="border border-dashed border-slate-300 p-8 text-sm text-slate-500 dark:border-slate-700">No usage data is available for this account yet.</div> : <><section className="border-y border-r border-slate-200 border-l-4 border-l-indigo-600 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6"><div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-400">Active plan</p><h2 className="mt-1 text-2xl font-bold text-slate-950 dark:text-white">{plan}</h2><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{finiteCount ? `${finiteCount} tracked allowance${finiteCount === 1 ? "" : "s"}` : "All listed allowances are uncapped"}</p></div><span className="inline-flex w-fit items-center gap-1.5 border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Active</span></div><div className="mt-6 border-t border-slate-200 pt-4 dark:border-slate-800"><p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Included features</p>{usage.features?.length ? <ul className="mt-3 grid gap-2 sm:grid-cols-2">{usage.features.map((feature) => <li key={feature} className="flex gap-2 text-sm text-slate-700 dark:text-slate-300"><Check size={16} className="mt-0.5 shrink-0 text-indigo-600" />{feature}</li>)}</ul> : <p className="mt-2 text-sm text-slate-500">No feature details have been added to this plan.</p>}</div></section><section className="border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6"><h2 className="text-base font-bold text-slate-950 dark:text-white">Your allowances</h2><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Usage is measured against the limits included with your plan.</p><div className="mt-6">{activeMeasures.map(([label, usageKey, limitKey, detail]) => <UsageInstrument key={limitKey} label={label} used={value(usage.usage?.[usageKey])} limit={limits[limitKey]} detail={detail} />)}</div></section>{limits.resetCadence && <p className="flex gap-2 text-xs text-slate-500 dark:text-slate-400"><RefreshCw size={14} className="shrink-0" /> Copy allowances reset {limits.resetCadence.toLowerCase()}.</p>}</>}</div>;
 }

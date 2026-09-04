@@ -4,6 +4,8 @@ const path = require("path");
 const fs = require("fs");
 const User = require("../models/User");
 const Prompt = require("../models/Prompt");
+const SubscriptionPlan = require("../models/SubscriptionPlan");
+const { userRateLimiter, adminRateLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
@@ -37,7 +39,7 @@ function normalizeUsername(username) {
     .replace(/[^a-z0-9_]/g, "");
 }
 
-router.get("/", async (_req, res) => {
+router.get("/", adminRateLimiter, async (_req, res) => {
   try {
     const users = await User.find({ role: "user" }).sort({ createdAt: -1 });
     res.json(users.map((u) => u.toSafeJSON()));
@@ -46,7 +48,7 @@ router.get("/", async (_req, res) => {
   }
 });
 
-router.get("/stats", async (_req, res) => {
+router.get("/stats", adminRateLimiter, async (_req, res) => {
   try {
     const [active, inactive, free, pro, team, mostCopied] = await Promise.all([
       User.countDocuments({ role: "user", status: "active" }),
@@ -68,7 +70,7 @@ router.get("/stats", async (_req, res) => {
   }
 });
 
-router.get("/revenue", async (_req, res) => {
+router.get("/revenue", adminRateLimiter, async (_req, res) => {
   try {
     const users = await User.find({ role: "user" });
     const invoices = [];
@@ -114,7 +116,7 @@ router.get("/revenue", async (_req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", userRateLimiter, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -127,7 +129,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", userRateLimiter, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -214,29 +216,33 @@ function nextBillingFromPeriod(billingPeriod, fromDate = new Date()) {
   return next;
 }
 
-router.post("/:id/subscribe", async (req, res) => {
+router.post("/:id/subscribe", userRateLimiter, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
-    const { planId, planName, planPrice, billingPeriod } = req.body;
-    if (!planName || planPrice === undefined || planPrice === null) {
-      return res.status(400).json({ message: "Plan details are required." });
+    const { planId, billingPeriod } = req.body;
+    const selectedPlan = await SubscriptionPlan.findById(planId);
+    if (!selectedPlan || selectedPlan.isActive === false) {
+      return res.status(400).json({ message: "Choose an active subscription plan." });
     }
 
     const period = ["monthly", "yearly", "lifetime"].includes(billingPeriod)
       ? billingPeriod
       : "monthly";
-    const amount = Number(planPrice);
+    const amount = Number(period === "yearly" ? selectedPlan.yearlyPrice : selectedPlan.monthlyPrice);
+    if (!Number.isFinite(amount)) {
+      return res.status(400).json({ message: "That billing period is not available for this plan." });
+    }
     const now = new Date();
     const invoiceId = `INV-${Date.now().toString().slice(-8)}`;
 
-    user.subscription = mapPlanToSubscription(planName);
+    user.subscription = mapPlanToSubscription(selectedPlan.name);
     user.billing = {
-      planId: planId || "",
-      planName: String(planName).trim(),
+      planId: selectedPlan.id,
+      planName: selectedPlan.name,
       planPrice: amount,
       billingPeriod: period,
       status: amount <= 0 ? "free" : "active",
@@ -246,7 +252,7 @@ router.post("/:id/subscribe", async (req, res) => {
         ...(user.billing?.invoices || []),
         {
           invoiceId,
-          planName: String(planName).trim(),
+          planName: selectedPlan.name,
           amount,
           billingPeriod: period,
           status: "paid",
@@ -262,7 +268,7 @@ router.post("/:id/subscribe", async (req, res) => {
   }
 });
 
-router.post("/:id/avatar", uploadAvatar.single("avatar"), async (req, res) => {
+router.post("/:id/avatar", userRateLimiter, uploadAvatar.single("avatar"), async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -282,7 +288,7 @@ router.post("/:id/avatar", uploadAvatar.single("avatar"), async (req, res) => {
   }
 });
 
-router.patch("/:id/status", async (req, res) => {
+router.patch("/:id/status", adminRateLimiter, async (req, res) => {
   try {
     const { status } = req.body;
     if (!["active", "inactive"].includes(status)) {

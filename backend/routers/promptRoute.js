@@ -4,6 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const Prompt = require("../models/Prompt");
 const { toRelativeUploadUrl } = require("../utils/media");
+const { adminRateLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
@@ -66,7 +67,7 @@ router.get("/most-copied", async (_req, res) => {
   }
 });
 
-router.post("/", upload.single("media"), async (req, res) => {
+router.post("/", adminRateLimiter, upload.single("media"), async (req, res) => {
   try {
     const { title, description, category, access, status } = req.body;
 
@@ -84,7 +85,7 @@ router.post("/", upload.single("media"), async (req, res) => {
       mediaUrl,
       thumbnail: mediaUrl,
       category: category || "General",
-      access: normalizeAccess(access || "Unassigned"),
+      access: normalizeAccess(access || "Free"),
       status: status || "Published",
       tags: ["uploaded"],
       views: 0,
@@ -99,7 +100,7 @@ router.post("/", upload.single("media"), async (req, res) => {
   }
 });
 
-router.patch("/:id/access", async (req, res) => {
+router.patch("/:id/access", adminRateLimiter, async (req, res) => {
   try {
     const access = normalizeAccess(req.body.access);
     const prompt = await Prompt.findByIdAndUpdate(
@@ -118,7 +119,7 @@ router.patch("/:id/access", async (req, res) => {
   }
 });
 
-router.patch("/:id", upload.single("media"), async (req, res) => {
+router.patch("/:id", adminRateLimiter, upload.single("media"), async (req, res) => {
   try {
     const prompt = await Prompt.findById(req.params.id);
     if (!prompt) {
@@ -163,7 +164,7 @@ router.patch("/:id", upload.single("media"), async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", adminRateLimiter, async (req, res) => {
   try {
     const deleted = await Prompt.findByIdAndDelete(req.params.id);
 

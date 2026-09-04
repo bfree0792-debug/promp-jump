@@ -11,7 +11,6 @@ import CategoriesPage from "./pages/CategoriesPage";
 import SubscriptionsPage from "./pages/SubscriptionsPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import RevenuePage from "./pages/RevenuePage";
-import AnnouncementsPage from "./pages/AnnouncementsPage";
 import PlaceholderPage from "./pages/PlaceholderPage";
 
 export default function App() {
@@ -31,7 +30,6 @@ export default function App() {
               <Route path="/subscriptions" element={<SubscriptionsPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/revenue" element={<RevenuePage />} />
-              <Route path="/announcements" element={<AnnouncementsPage />} />
               <Route
                 path="/settings"
                 element={

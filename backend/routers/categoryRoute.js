@@ -3,6 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const Category = require("../models/Category");
+const { adminRateLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
@@ -37,7 +38,7 @@ router.get("/", async (_req, res) => {
   }
 });
 
-router.post("/", upload.single("icon"), async (req, res) => {
+router.post("/", adminRateLimiter, upload.single("icon"), async (req, res) => {
   try {
     const { name, description } = req.body;
     if (!name || !name.trim()) {
@@ -66,9 +67,14 @@ router.post("/", upload.single("icon"), async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", adminRateLimiter, async (req, res) => {
   try {
-    const deleted = await Category.findByIdAndDelete(req.params.id);
+    const categoryId = req.params.id;
+    if (!categoryId || !String(categoryId).trim()) {
+      return res.status(400).json({ message: "Category ID is required." });
+    }
+
+    const deleted = await Category.findByIdAndDelete(categoryId);
     if (!deleted) {
       return res.status(404).json({ message: "Category not found." });
     }
@@ -83,9 +89,10 @@ router.delete("/:id", async (req, res) => {
       // ignore cleanup errors
     }
 
-    res.json({ message: "Category deleted." });
+    res.json({ message: "Category deleted successfully.", category: deleted });
   } catch (error) {
-    res.status(500).json({ message: "Could not delete category." });
+    console.error("Error deleting category:", error);
+    res.status(500).json({ message: error.message || "Could not delete category." });
   }
 });
 

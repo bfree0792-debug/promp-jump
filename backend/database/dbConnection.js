@@ -1,19 +1,19 @@
-const mongoose = require("mongoose");
+const { supabase } = require("../lib/supabase");
 
-const dbConnection = async () => {
-  const mongoUrl = process.env.MONGO_URL || process.env.MONGO_URI;
-
-  if (!mongoUrl) {
-    throw new Error("MONGO_URL or MONGO_URI is missing in backend/config/config.env");
+const testConnection = async () => {
+  try {
+    const { data, error } = await supabase.from("users").select("count", { count: "exact", head: true });
+    if (error && error.code !== "PGRST116" && !error.message.includes("relation")) {
+      console.error("Supabase connection error:", error.message);
+      return false;
+    }
+    console.log("Connected to Supabase successfully");
+    return true;
+  } catch (err) {
+    console.error("Supabase connection failed:", err.message);
+    return false;
   }
-
-  await mongoose.connect(mongoUrl, {
-    dbName: "test",
-    serverSelectionTimeoutMS: 12000,
-    family: 4,
-  });
-
-  console.log("Connected to database successfully");
 };
 
-module.exports = dbConnection;
+module.exports = testConnection;
+

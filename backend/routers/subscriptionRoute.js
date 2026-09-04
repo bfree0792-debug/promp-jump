@@ -1,5 +1,6 @@
 const express = require("express");
 const SubscriptionPlan = require("../models/SubscriptionPlan");
+const { adminRateLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
@@ -20,6 +21,18 @@ function parseOptionalPrice(value) {
   return num;
 }
 
+const allowanceKeys = ["favorites", "videoCopies", "imageCopies", "savedPrompts", "premiumPrompts"];
+function validateLimits(limits) {
+  if (!limits || typeof limits !== "object" || Array.isArray(limits)) return null;
+  for (const key of allowanceKeys) {
+    if (!Object.prototype.hasOwnProperty.call(limits, key)) continue;
+    if (limits[key] !== null && (!Number.isFinite(Number(limits[key])) || Number(limits[key]) < 0)) {
+      return `${key} must be a non-negative number or null for unlimited.`;
+    }
+  }
+  return null;
+}
+
 router.get("/", async (_req, res) => {
   try {
     const plans = await SubscriptionPlan.find().sort({ createdAt: 1 });
@@ -29,9 +42,9 @@ router.get("/", async (_req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", adminRateLimiter, async (req, res) => {
   try {
-    const { name, monthlyPrice, yearlyPrice, price, billingPeriod, features } = req.body;
+    const { name, monthlyPrice, yearlyPrice, price, billingPeriod, features, limits } = req.body;
 
     if (!name || name.trim() === "") {
       return res.status(400).json({ message: "Plan name is required." });
@@ -58,6 +71,8 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Set at least a monthly or yearly price." });
     }
 
+    const limitError = validateLimits(limits || {});
+    if (limitError) return res.status(400).json({ message: limitError });
     const plan = await SubscriptionPlan.create({
       name: name.trim(),
       monthlyPrice: monthly,
@@ -65,6 +80,7 @@ router.post("/", async (req, res) => {
       price: monthly ?? yearly ?? 0,
       billingPeriod: monthly !== null && yearly !== null ? "both" : yearly !== null ? "yearly" : "monthly",
       features: parseFeatures(features),
+      limits: limits || {},
       isActive: true,
     });
 
@@ -74,14 +90,14 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", adminRateLimiter, async (req, res) => {
   try {
     const plan = await SubscriptionPlan.findById(req.params.id);
     if (!plan) {
       return res.status(404).json({ message: "Plan not found." });
     }
 
-    const { name, monthlyPrice, yearlyPrice, features, isActive } = req.body;
+    const { name, monthlyPrice, yearlyPrice, features, limits, isActive } = req.body;
 
     if (name !== undefined) {
       const trimmed = String(name).trim();
@@ -110,6 +126,11 @@ router.patch("/:id", async (req, res) => {
     if (features !== undefined) {
       plan.features = parseFeatures(features);
     }
+    if (limits !== undefined) {
+      const limitError = validateLimits(limits);
+      if (limitError) return res.status(400).json({ message: limitError });
+      plan.limits = limits;
+    }
 
     if (isActive !== undefined) {
       plan.isActive = Boolean(isActive);
@@ -135,7 +156,7 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", adminRateLimiter, async (req, res) => {
   try {
     const deleted = await SubscriptionPlan.findByIdAndDelete(req.params.id);
     if (!deleted) {

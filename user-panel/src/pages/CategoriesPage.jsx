@@ -106,7 +106,7 @@ export default function CategoriesPage() {
               emptyText={
                 selectedName
                   ? `No prompts in ${selectedName} yet.`
-                  : "No prompts available yet."
+                  : "No published prompts yet. Assign Free, Pro, or Team in admin."
               }
             />
           </div>

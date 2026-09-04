@@ -1,6 +1,6 @@
 const TOKEN_KEY = "promptgenieToken";
 const USER_KEY = "promptgenieUser";
-const LOGIN_URL = "http://localhost:3001/login";
+const LOGIN_URL = "http://localhost:3000/login.html";
 const USER_PANEL_URL = "http://localhost:3001";
 
 export function getStoredToken() {

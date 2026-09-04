@@ -7,7 +7,6 @@ import {
   CreditCard,
   BarChart3,
   Wallet,
-  Megaphone,
   Settings,
 } from "lucide-react";
 
@@ -20,6 +19,5 @@ export const navItems = [
   { label: "Subscription Plans", path: "/subscriptions", icon: CreditCard },
   { label: "Analytics", path: "/analytics", icon: BarChart3 },
   { label: "Revenue", path: "/revenue", icon: Wallet },
-  { label: "Announcements", path: "/announcements", icon: Megaphone },
   { label: "Settings", path: "/settings", icon: Settings },
 ];

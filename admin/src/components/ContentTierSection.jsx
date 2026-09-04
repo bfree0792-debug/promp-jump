@@ -7,6 +7,7 @@ export default function ContentTierSection({ tier }) {
   const [allPrompts, setAllPrompts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPicker, setShowPicker] = useState(false);
+  const [removingId, setRemovingId] = useState(null);
 
   async function load() {
     setLoading(true);
@@ -39,17 +40,17 @@ export default function ContentTierSection({ tier }) {
   }
 
   async function removeFromTier(promptId) {
-    const ok = window.confirm(
-      `Remove this prompt from ${tier} section?\n\nIt will NOT be deleted. It will stay in Prompt Management.`
-    );
-    if (!ok) return;
+    if (!promptId) return;
 
+    setRemovingId(promptId);
     try {
       // Only unassign from this section — never permanently delete here
       await api.setPromptAccess(promptId, "Unassigned");
       await load();
     } catch (error) {
       window.alert(error.message);
+    } finally {
+      setRemovingId(null);
     }
   }
 
@@ -80,9 +81,13 @@ export default function ContentTierSection({ tier }) {
           <p className="text-sm text-slate-500">No prompts in {tier} yet.</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {items.map((item) => (
+            {items.map((item) => {
+              const promptId = item.id || item._id;
+              const isRemoving = removingId === promptId;
+
+              return (
               <div
-                key={item.id}
+                key={promptId || item.title}
                 className="rounded-xl border border-slate-100 overflow-hidden bg-slate-50"
               >
                 <div className="relative h-28 bg-slate-200">
@@ -110,15 +115,18 @@ export default function ContentTierSection({ tier }) {
                     {item.description || "No description"}
                   </p>
                   <button
-                    onClick={() => removeFromTier(item.id)}
-                    className="mt-3 w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg border border-red-200 text-red-600 text-xs font-semibold hover:bg-red-50"
+                    type="button"
+                    disabled={isRemoving}
+                    onClick={() => removeFromTier(promptId)}
+                    className="mt-3 w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg border border-red-200 text-red-600 text-xs font-semibold hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                    Remove from {tier}
+                    {isRemoving ? "Removing..." : `Remove from ${tier}`}
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

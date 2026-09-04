@@ -76,12 +76,26 @@ export function LibraryProvider({ children }) {
 
   async function toggleSave(promptId) {
     if (!user?.id) return;
+    const currentlySaved = savedIds.includes(promptId);
+    const optimisticSaved = !currentlySaved;
+
+    setSavedIds((prev) =>
+      optimisticSaved
+        ? [...prev, promptId]
+        : prev.filter((id) => id !== promptId),
+    );
+
     try {
       const result = await api.toggleSave(user.id, promptId);
       applyUserResult(result.user, result.usage);
       showToast(result.saved ? "Saved to library" : "Removed from saved");
       return result;
     } catch (error) {
+      setSavedIds((prev) =>
+        currentlySaved
+          ? [...prev, promptId]
+          : prev.filter((id) => id !== promptId),
+      );
       showToast(error.message || "Could not save prompt.");
       throw error;
     }
@@ -89,30 +103,48 @@ export function LibraryProvider({ children }) {
 
   async function toggleLike(promptId) {
     if (!user?.id) return;
+    const currentlyLiked = likedIds.includes(promptId);
+    const optimisticLiked = !currentlyLiked;
+
+    setLikedIds((prev) =>
+      optimisticLiked
+        ? [...prev, promptId]
+        : prev.filter((id) => id !== promptId),
+    );
+
     try {
       const result = await api.toggleLike(user.id, promptId);
       applyUserResult(result.user, result.usage);
       showToast(result.liked ? "Added to favorites" : "Removed from favorites");
       return result;
     } catch (error) {
+      setLikedIds((prev) =>
+        currentlyLiked
+          ? [...prev, promptId]
+          : prev.filter((id) => id !== promptId),
+      );
       showToast(error.message || "Could not update favorite.");
       throw error;
     }
   }
 
   async function copyPromptText(promptId, fallbackText = "") {
-    if (!user?.id) return;
+    if (!user?.id) return { ok: false, error: "Please log in to download prompts." };
+
     try {
       const result = await api.copyPrompt(user.id, promptId);
-      if (result.user) applyUserResult(result.user, result.usage);
-      const text = result.text || fallbackText || "";
-      await navigator.clipboard.writeText(text);
+      const text = result?.text || fallbackText || "";
+
+      await navigator.clipboard.writeText(text).catch(() => {});
       recordHistory(promptId);
       showToast("Prompt text copied");
+
+      if (result.user) applyUserResult(result.user, result.usage);
       return result;
     } catch (error) {
-      showToast(error.message || "Could not copy prompt.");
-      throw error;
+      const message = error.message || "Could not record copy.";
+      showToast(message);
+      return { ok: false, error: message };
     }
   }
 

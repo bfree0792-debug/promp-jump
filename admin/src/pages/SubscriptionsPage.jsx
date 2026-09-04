@@ -14,7 +14,32 @@ const emptyForm = {
   monthlyPrice: "",
   yearlyPrice: "",
   features: "",
+  favorites: "", videoCopies: "", imageCopies: "", savedPrompts: "", premiumPrompts: "",
+  unlimitedFavorites: false, unlimitedVideoCopies: false, unlimitedImageCopies: false, unlimitedSavedPrompts: false, unlimitedPremiumPrompts: false,
 };
+
+const allowanceFields = [
+  ["favorites", "Favorites"], ["videoCopies", "Video copies today"], ["imageCopies", "Image copies today"], ["savedPrompts", "Saved prompts"], ["premiumPrompts", "Premium prompts"],
+];
+function limitsFromForm(form) {
+  return allowanceFields.reduce((limits, [key]) => {
+    if (form[`unlimited${key[0].toUpperCase()}${key.slice(1)}`]) limits[key] = null;
+    else if (form[key] !== "") limits[key] = Number(form[key]);
+    return limits;
+  }, {});
+}
+function formFromPlan(plan) {
+  const limits = plan.limits || {};
+  return allowanceFields.reduce((form, [key]) => {
+    const isUnlimited = limits[key] === null;
+    form[key] = isUnlimited || limits[key] === undefined ? "" : String(limits[key]);
+    form[`unlimited${key[0].toUpperCase()}${key.slice(1)}`] = isUnlimited;
+    return form;
+  }, { name: plan.name || "", monthlyPrice: plan.monthlyPrice == null ? "" : String(plan.monthlyPrice), yearlyPrice: plan.yearlyPrice == null ? "" : String(plan.yearlyPrice), features: (plan.features || []).join("\n") });
+}
+function AllowanceFields({ form, onChange, inputClass }) {
+  return <fieldset className="border-t border-slate-100 pt-4"><legend className="text-sm font-bold text-slate-800">Included allowances</legend><p className="mt-1 text-xs text-slate-500">Enter a cap (for example, 20), or explicitly select Unlimited. Blank keeps the legacy tier default.</p><div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">{allowanceFields.map(([key, label]) => { const unlimitedKey = `unlimited${key[0].toUpperCase()}${key.slice(1)}`; return <label key={key} className="rounded-lg border border-slate-200 bg-slate-50 p-3"><span className="block text-xs font-semibold text-slate-600">{label}</span><div className="mt-2 flex items-center gap-2"><input type="number" min="0" step="1" disabled={form[unlimitedKey]} value={form[key]} onChange={(e) => onChange(key, e.target.value)} placeholder="20" className={`${inputClass} py-2 disabled:opacity-40`} /><label className="flex shrink-0 items-center gap-1 text-xs text-slate-600"><input type="checkbox" checked={form[unlimitedKey]} onChange={(e) => onChange(unlimitedKey, e.target.checked)} /> Unlimited</label></div></label>; })}</div></fieldset>;
+}
 
 export default function SubscriptionsPage() {
   const [plans, setPlans] = useState([]);
@@ -52,16 +77,33 @@ export default function SubscriptionsPage() {
     }
 
     setSaving(true);
+
+    const optimisticPlan = {
+      id: `temp_${Date.now()}`,
+      name: form.name,
+      monthlyPrice: form.monthlyPrice === "" ? null : Number(form.monthlyPrice),
+      yearlyPrice: form.yearlyPrice === "" ? null : Number(form.yearlyPrice),
+      features: form.features.split("\n").filter(Boolean),
+      limits: limitsFromForm(form),
+      isActive: true,
+    };
+
+    setPlans((current) => [...current, optimisticPlan]);
+    setForm(emptyForm);
+
     try {
       await api.createPlan({
-        name: form.name,
-        monthlyPrice: form.monthlyPrice === "" ? null : Number(form.monthlyPrice),
-        yearlyPrice: form.yearlyPrice === "" ? null : Number(form.yearlyPrice),
-        features: form.features,
+        name: optimisticPlan.name,
+        monthlyPrice: optimisticPlan.monthlyPrice,
+        yearlyPrice: optimisticPlan.yearlyPrice,
+        features: optimisticPlan.features,
+        limits: optimisticPlan.limits,
       });
-      setForm(emptyForm);
       await load();
     } catch (error) {
+      setPlans((current) =>
+        current.filter((p) => p.id !== optimisticPlan.id)
+      );
       window.alert(error.message);
     } finally {
       setSaving(false);
@@ -70,18 +112,7 @@ export default function SubscriptionsPage() {
 
   function startEdit(plan) {
     setEditingId(plan.id);
-    setEditForm({
-      name: plan.name || "",
-      monthlyPrice:
-        plan.monthlyPrice === null || plan.monthlyPrice === undefined
-          ? ""
-          : String(plan.monthlyPrice),
-      yearlyPrice:
-        plan.yearlyPrice === null || plan.yearlyPrice === undefined
-          ? ""
-          : String(plan.yearlyPrice),
-      features: (plan.features || []).join("\n"),
-    });
+    setEditForm(formFromPlan(plan));
   }
 
   async function handleUpdate(e) {
@@ -93,17 +124,35 @@ export default function SubscriptionsPage() {
     }
 
     setSaving(true);
+
+    const optimisticPlan = {
+      ...plans.find((p) => p.id === editingId),
+      name: editForm.name,
+      monthlyPrice: editForm.monthlyPrice === "" ? null : Number(editForm.monthlyPrice),
+      yearlyPrice: editForm.yearlyPrice === "" ? null : Number(editForm.yearlyPrice),
+      features: editForm.features.split("\n").filter(Boolean),
+      limits: limitsFromForm(editForm),
+    };
+
+    setPlans((current) =>
+      current.map((p) => (p.id === editingId ? optimisticPlan : p))
+    );
+    setEditingId(null);
+    setEditForm(emptyForm);
+
     try {
       await api.updatePlan(editingId, {
-        name: editForm.name,
-        monthlyPrice: editForm.monthlyPrice === "" ? null : Number(editForm.monthlyPrice),
-        yearlyPrice: editForm.yearlyPrice === "" ? null : Number(editForm.yearlyPrice),
-        features: editForm.features,
+        name: optimisticPlan.name,
+        monthlyPrice: optimisticPlan.monthlyPrice,
+        yearlyPrice: optimisticPlan.yearlyPrice,
+        features: optimisticPlan.features,
+        limits: optimisticPlan.limits,
       });
-      setEditingId(null);
-      setEditForm(emptyForm);
       await load();
     } catch (error) {
+      setPlans((current) =>
+        current.map((p) => (p.id === editingId ? { ...p, ...optimisticPlan } : p))
+      );
       window.alert(error.message);
     } finally {
       setSaving(false);
@@ -112,14 +161,18 @@ export default function SubscriptionsPage() {
 
   async function handleDelete(id) {
     if (!window.confirm("Delete this plan?")) return;
+
+    const previousPlans = plans;
+    setPlans((current) => current.filter((p) => p.id !== id));
+    if (editingId === id) {
+      setEditingId(null);
+      setEditForm(emptyForm);
+    }
+
     try {
       await api.deletePlan(id);
-      if (editingId === id) {
-        setEditingId(null);
-        setEditForm(emptyForm);
-      }
-      await load();
     } catch (error) {
+      setPlans(previousPlans);
       window.alert(error.message);
     }
   }
@@ -178,6 +231,7 @@ export default function SubscriptionsPage() {
           rows={4}
           className={inputClass}
         />
+        <AllowanceFields form={form} onChange={(key, value) => updateField(setForm, key, value)} inputClass={inputClass} />
 
         <button
           type="submit"
@@ -250,6 +304,7 @@ export default function SubscriptionsPage() {
                     className={inputClass}
                     placeholder="Features (one per line)"
                   />
+                  <AllowanceFields form={editForm} onChange={(key, value) => updateField(setEditForm, key, value)} inputClass={inputClass} />
                   <div className="flex gap-2">
                     <button
                       type="submit"
@@ -320,6 +375,9 @@ export default function SubscriptionsPage() {
                       ))
                     )}
                   </ul>
+                  <div className="mt-4 grid grid-cols-2 gap-2 border-t border-slate-100 pt-4 text-xs text-slate-600">
+                    {allowanceFields.map(([key, label]) => <p key={key}><span className="font-semibold text-slate-700">{label}:</span> {plan.limits?.[key] === null ? "Unlimited" : plan.limits?.[key] ?? "Tier default"}</p>)}
+                  </div>
 
                   <button
                     onClick={() => handleDelete(plan.id)}

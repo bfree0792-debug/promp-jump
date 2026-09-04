@@ -53,28 +53,53 @@ export default function AnnouncementsPage() {
     e.preventDefault();
     setSaving(true);
     setError("");
-    try {
-      if (editingId) {
-        await api.updateAnnouncement(editingId, form);
-      } else {
-        await api.createAnnouncement(form);
-      }
+
+    if (editingId) {
+      const previousItems = items;
+      setItems((current) =>
+        current.map((item) =>
+          item.id === editingId ? { ...item, ...form } : item
+        )
+      );
       cancelEdit();
-      await load();
-    } catch (err) {
-      setError(err.message || "Could not save announcement.");
-    } finally {
-      setSaving(false);
+      try {
+        await api.updateAnnouncement(editingId, form);
+      } catch (err) {
+        setItems(previousItems);
+        setError(err.message || "Could not save announcement.");
+      } finally {
+        setSaving(false);
+      }
+    } else {
+      const optimisticItem = {
+        id: `temp_${Date.now()}`,
+        ...form,
+        createdAt: new Date().toISOString(),
+      };
+      setItems((current) => [optimisticItem, ...current]);
+      cancelEdit();
+      try {
+        await api.createAnnouncement(form);
+      } catch (err) {
+        setItems((current) =>
+          current.filter((item) => item.id !== optimisticItem.id)
+        );
+        setError(err.message || "Could not save announcement.");
+      } finally {
+        setSaving(false);
+      }
     }
   }
 
   async function handleDelete(id) {
     if (!window.confirm("Delete this announcement?")) return;
+    const previousItems = items;
+    setItems((current) => current.filter((item) => item.id !== id));
+    if (editingId === id) cancelEdit();
     try {
       await api.deleteAnnouncement(id);
-      if (editingId === id) cancelEdit();
-      await load();
     } catch (err) {
+      setItems(previousItems);
       window.alert(err.message || "Could not delete announcement.");
     }
   }

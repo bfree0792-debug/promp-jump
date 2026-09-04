@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { api } from "../lib/api";
 import { isFreeAccess, isPremiumAccess, isPublishedPrompt } from "../lib/prompts";
-import { PromptGrid } from "../components/PromptCard";
+import { PromptGrid, LandscapePromptGrid } from "../components/PromptCard";
 
 const SECTION_META = {
   trending: {
@@ -17,6 +17,14 @@ const SECTION_META = {
   free: {
     title: "Free Prompts",
     description: "Prompts available on the Free plan.",
+  },
+  random: {
+    title: "Random Prompts",
+    description: "A mixed showcase of Free, Pro, and Team AI image prompts.",
+  },
+  video: {
+    title: "Video Prompts",
+    description: "High quality AI video prompts, animations, and cinematic scenes.",
   },
 };
 
@@ -51,6 +59,31 @@ export default function BrowsePage() {
           return;
         }
 
+        if (section === "random") {
+          const isVideoPrompt = (p) =>
+            p.type === "Video" ||
+            (p.mediaUrl && /\.(mp4|webm|mov|ogg)$/i.test(p.mediaUrl)) ||
+            (p.category && p.category.toLowerCase().includes("video"));
+
+          const isImagePrompt = (p) =>
+            p.type === "Image" ||
+            (!p.type && (!p.mediaUrl || !/\.(mp4|webm|mov|ogg)$/i.test(p.mediaUrl))) ||
+            (!isVideoPrompt(p));
+
+          const allImages = published.filter(isImagePrompt);
+          setPrompts([...allImages].sort(() => Math.random() - 0.5));
+          return;
+        }
+
+        if (section === "video") {
+          const isVideoPrompt = (p) =>
+            p.type === "Video" ||
+            (p.mediaUrl && /\.(mp4|webm|mov|ogg)$/i.test(p.mediaUrl)) ||
+            (p.category && p.category.toLowerCase().includes("video"));
+          setPrompts(published.filter(isVideoPrompt));
+          return;
+        }
+
         const trendingPublished = (Array.isArray(trendingData) ? trendingData : []).filter(
           (p) => p.status === "Published" && p.access !== "Unassigned"
         );
@@ -66,9 +99,11 @@ export default function BrowsePage() {
   }, [section]);
 
   const emptyText = useMemo(() => {
-    if (section === "premium") return "No premium prompts yet.";
-    if (section === "free") return "No free prompts yet.";
-    return "No trending prompts yet.";
+    if (section === "premium") return "No premium prompts yet. Assign Pro or Team in admin.";
+    if (section === "free") return "No free prompts yet. Assign Free in admin.";
+    if (section === "random") return "No image prompts found.";
+    if (section === "video") return "No video prompts yet. Add Video type prompts in admin.";
+    return "No published prompts yet. Assign Free, Pro, or Team in admin.";
   }, [section]);
 
   return (
@@ -93,6 +128,8 @@ export default function BrowsePage() {
 
       {loading ? (
         <p className="text-sm text-slate-500">Loading prompts...</p>
+      ) : section === "video" ? (
+        <LandscapePromptGrid prompts={prompts} emptyText={emptyText} />
       ) : (
         <PromptGrid prompts={prompts} emptyText={emptyText} />
       )}

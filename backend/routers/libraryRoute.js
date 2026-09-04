@@ -1,18 +1,20 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const User = require("../models/User");
 const Prompt = require("../models/Prompt");
 const {
-  getPlanLimits,
+  resolvePlanForUser,
   ensureDailyUsage,
   canAccessPrompt,
+  canUsePremiumPrompt,
   getUsageSummary,
 } = require("../lib/planLimits");
+const { userRateLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
+router.use(userRateLimiter);
 
 function isValidId(id) {
-  return mongoose.Types.ObjectId.isValid(id);
+  return typeof id === "string" && id.trim().length > 0;
 }
 
 function accessDeniedMessage(subscription, access) {
@@ -40,7 +42,7 @@ router.get("/:userId/library", async (req, res) => {
       user: user.toSafeJSON(),
       saved: saved.map((p) => p.toJSON()),
       liked: liked.map((p) => p.toJSON()),
-      usage: getUsageSummary(user),
+      usage: await getUsageSummary(user),
     });
   } catch (error) {
     res.status(500).json({ message: "Could not fetch library." });
@@ -59,7 +61,7 @@ router.get("/:userId/usage", async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    res.json(getUsageSummary(user));
+    res.json(await getUsageSummary(user));
   } catch (error) {
     res.status(500).json({ message: "Could not fetch usage." });
   }
@@ -87,17 +89,22 @@ router.post("/:userId/save/:promptId", async (req, res) => {
       return res.json({
         saved: false,
         user: user.toSafeJSON(),
-        usage: getUsageSummary(user),
+        usage: await getUsageSummary(user),
       });
     }
 
-    if (!canAccessPrompt(user, prompt)) {
+    const plan = await resolvePlanForUser(user);
+    if (!await canAccessPrompt(user, prompt, plan)) {
       return res.status(403).json({
-        message: accessDeniedMessage(user.subscription, prompt.access),
+        message: accessDeniedMessage(plan.name, prompt.access),
       });
     }
 
-    const limits = getPlanLimits(user.subscription);
+    const limits = plan.limits;
+
+    if (!canUsePremiumPrompt(user, prompt, plan)) {
+      return res.status(403).json({ message: `Premium prompt allowance reached: ${limits.premiumPrompts} today. Try again tomorrow or upgrade.` });
+    }
 
     if (limits.savesImagesOnly && prompt.type !== "Image") {
       return res.status(403).json({
@@ -105,9 +112,9 @@ router.post("/:userId/save/:promptId", async (req, res) => {
       });
     }
 
-    if (limits.maxSaves !== null && user.savedPrompts.length >= limits.maxSaves) {
+    if (limits.savedPrompts !== null && user.savedPrompts.length >= limits.savedPrompts) {
       return res.status(403).json({
-        message: `Free plan limit reached: max ${limits.maxSaves} saved images. Upgrade for more saves.`,
+        message: `Saved prompt allowance reached: ${limits.savedPrompts}. Upgrade for more saves.`,
       });
     }
 
@@ -116,7 +123,7 @@ router.post("/:userId/save/:promptId", async (req, res) => {
     res.json({
       saved: true,
       user: user.toSafeJSON(),
-      usage: getUsageSummary(user),
+      usage: await getUsageSummary(user, plan),
     });
   } catch (error) {
     res.status(500).json({ message: "Could not update saved prompts." });
@@ -148,20 +155,21 @@ router.post("/:userId/like/:promptId", async (req, res) => {
         likes: prompt.likes,
         user: user.toSafeJSON(),
         prompt: prompt.toJSON(),
-        usage: getUsageSummary(user),
+        usage: await getUsageSummary(user),
       });
     }
 
-    if (!canAccessPrompt(user, prompt)) {
+    const plan = await resolvePlanForUser(user);
+    if (!await canAccessPrompt(user, prompt, plan)) {
       return res.status(403).json({
-        message: accessDeniedMessage(user.subscription, prompt.access),
+        message: accessDeniedMessage(plan.name, prompt.access),
       });
     }
 
-    const limits = getPlanLimits(user.subscription);
-    if (limits.maxFavorites !== null && user.likedPrompts.length >= limits.maxFavorites) {
+    const limits = plan.limits;
+    if (limits.favorites !== null && user.likedPrompts.length >= limits.favorites) {
       return res.status(403).json({
-        message: `Free plan limit reached: max ${limits.maxFavorites} favorites. Upgrade for unlimited favorites.`,
+        message: `Favorites allowance reached: ${limits.favorites}. Upgrade for more favorites.`,
       });
     }
 
@@ -174,7 +182,7 @@ router.post("/:userId/like/:promptId", async (req, res) => {
       likes: prompt.likes,
       user: user.toSafeJSON(),
       prompt: prompt.toJSON(),
-      usage: getUsageSummary(user),
+      usage: await getUsageSummary(user, plan),
     });
   } catch (error) {
     res.status(500).json({ message: "Could not update like." });
@@ -196,37 +204,44 @@ router.post("/:userId/copy/:promptId", async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found." });
     if (!prompt) return res.status(404).json({ message: "Prompt not found." });
 
-    if (!canAccessPrompt(user, prompt)) {
+    const plan = await resolvePlanForUser(user);
+    if (!await canAccessPrompt(user, prompt, plan)) {
       return res.status(403).json({
-        message: accessDeniedMessage(user.subscription, prompt.access),
+        message: accessDeniedMessage(plan.name, prompt.access),
       });
     }
 
-    const limits = getPlanLimits(user.subscription);
+    const limits = plan.limits;
     const usage = ensureDailyUsage(user);
     const isVideo = prompt.type === "Video";
 
+    if (!canUsePremiumPrompt(user, prompt, plan)) {
+      return res.status(403).json({ message: `Premium prompt allowance reached: ${limits.premiumPrompts} today. Try again tomorrow or upgrade.` });
+    }
+
     if (isVideo) {
       if (
-        limits.dailyVideoCopies !== null &&
-        usage.videoCopies >= limits.dailyVideoCopies
+        limits.videoCopies !== null &&
+        usage.videoCopies >= limits.videoCopies
       ) {
         return res.status(403).json({
-          message: `Daily free limit reached: ${limits.dailyVideoCopies} video description copies. Try again tomorrow or upgrade.`,
+          message: "Daily limit reached. Please update your plan to continue.",
         });
       }
       usage.videoCopies = (usage.videoCopies || 0) + 1;
     } else {
       if (
-        limits.dailyImageCopies !== null &&
-        usage.imageCopies >= limits.dailyImageCopies
+        limits.imageCopies !== null &&
+        usage.imageCopies >= limits.imageCopies
       ) {
         return res.status(403).json({
-          message: `Daily free limit reached: ${limits.dailyImageCopies} image description copies. Try again tomorrow or upgrade.`,
+          message: "Daily limit reached. Please update your plan to continue.",
         });
       }
       usage.imageCopies = (usage.imageCopies || 0) + 1;
     }
+
+    if (prompt.access !== "Free") usage.premiumPrompts = (usage.premiumPrompts || 0) + 1;
 
     user.dailyUsage = usage;
     prompt.copies = (prompt.copies || 0) + 1;
@@ -240,7 +255,7 @@ router.post("/:userId/copy/:promptId", async (req, res) => {
       downloads: prompt.downloads,
       prompt: prompt.toJSON(),
       user: user.toSafeJSON(),
-      usage: getUsageSummary(user),
+      usage: await getUsageSummary(user, plan),
     });
   } catch (error) {
     res.status(500).json({ message: "Could not copy prompt." });

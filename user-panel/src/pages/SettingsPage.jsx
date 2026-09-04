@@ -234,12 +234,6 @@ export default function SettingsPage() {
         description="Choose which emails you want to receive."
       >
         <Toggle
-          label="Product updates and announcements"
-          description="New features, improvements, and platform news."
-          checked={settings.emailNotifications.productUpdates}
-          onChange={(value) => updateEmailNotification("productUpdates", value)}
-        />
-        <Toggle
           label="Weekly newsletter"
           description="A curated digest of trending prompts every week."
           checked={settings.emailNotifications.weeklyNewsletter}

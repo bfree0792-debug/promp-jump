@@ -4,7 +4,14 @@ import { ChevronRight, FolderKanban } from "lucide-react";
 import { api, mediaUrl } from "../lib/api";
 import { isPremiumAccess, isPublishedPrompt } from "../lib/prompts";
 import { useSettings } from "../lib/settings";
-import { PromptCard, PromptModal, TrendingPromptCard, PORTRAIT_CARD_CLASS } from "../components/PromptCard";
+import {
+  PromptCard,
+  PromptModal,
+  TrendingPromptCard,
+  LandscapePromptCard,
+  PORTRAIT_CARD_CLASS,
+  LANDSCAPE_CARD_CLASS,
+} from "../components/PromptCard";
 
 const PREVIEW_LIMIT = 5;
 
@@ -14,7 +21,12 @@ function HorizontalPromptRow({ prompts, emptyText, viewMoreTo, alwaysShowViewMor
   const hasMore = prompts.length > PREVIEW_LIMIT;
   const showViewMore = viewMoreTo && (alwaysShowViewMore || hasMore);
   const isPortrait = variant === "portrait";
-  const cardClass = isPortrait ? `${PORTRAIT_CARD_CLASS} snap-start` : "w-[220px] sm:w-[240px] shrink-0 snap-start";
+  const isLandscape = variant === "landscape" || variant === "16:9" || variant === "video";
+  const cardClass = isLandscape
+    ? `${LANDSCAPE_CARD_CLASS} snap-start`
+    : isPortrait
+    ? `${PORTRAIT_CARD_CLASS} snap-start`
+    : "w-[220px] sm:w-[240px] shrink-0 snap-start";
 
   if (!prompts.length) {
     return (
@@ -29,7 +41,9 @@ function HorizontalPromptRow({ prompts, emptyText, viewMoreTo, alwaysShowViewMor
       <div className="flex gap-2.5 sm:gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
         {preview.map((prompt) => (
           <div key={prompt.id} className={cardClass}>
-            {isPortrait ? (
+            {isLandscape ? (
+              <LandscapePromptCard prompt={prompt} onOpen={setSelected} />
+            ) : isPortrait ? (
               <TrendingPromptCard prompt={prompt} onOpen={setSelected} />
             ) : (
               <PromptCard prompt={prompt} onOpen={setSelected} />
@@ -41,7 +55,7 @@ function HorizontalPromptRow({ prompts, emptyText, viewMoreTo, alwaysShowViewMor
           <Link
             to={viewMoreTo}
             className={`${cardClass} snap-start flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-slate-400 transition-colors ${
-              isPortrait ? "aspect-[3/4]" : "min-h-[220px]"
+              isLandscape ? "aspect-video" : isPortrait ? "aspect-[3/4]" : "min-h-[220px]"
             }`}
           >
             <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-700">
@@ -134,16 +148,60 @@ function CategoriesSection({ categories }) {
   );
 }
 
+function RandomPromptsGridSection({ prompts, emptyText }) {
+  const [selected, setSelected] = useState(null);
+
+  if (!prompts.length) {
+    return (
+      <section className="mb-8">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-bold text-slate-900">Random Prompts</h2>
+          <span className="text-xs text-slate-400">0 items</span>
+        </div>
+        <div className="bg-white border border-slate-200 rounded-xl p-6 text-sm text-slate-500">
+          {emptyText || "No image prompts yet."}
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mb-8">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-base font-bold text-slate-900">Random Prompts</h2>
+          <p className="text-xs text-slate-500 mt-0.5">Explore all Free, Pro, and Team image prompts</p>
+        </div>
+        <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+          {prompts.length} images
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+        {prompts.map((prompt) => (
+          <TrendingPromptCard
+            key={prompt.id}
+            prompt={prompt}
+            onOpen={setSelected}
+          />
+        ))}
+      </div>
+      <PromptModal prompt={selected} onClose={() => setSelected(null)} />
+    </section>
+  );
+}
+
 export default function Dashboard() {
   const [trending, setTrending] = useState([]);
   const [premium, setPremium] = useState([]);
   const [free, setFree] = useState([]);
+  const [randomPrompts, setRandomPrompts] = useState([]);
+  const [videoPrompts, setVideoPrompts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { profile, settings } = useSettings();
+  const { profile } = useSettings();
   const firstName = profile?.fullName?.split(" ")[0] || "User";
-  const showTrending = settings.preferences.showTrendingOnDashboard;
 
   useEffect(() => {
     async function load() {
@@ -173,6 +231,23 @@ export default function Dashboard() {
         );
         setPremium(published.filter((p) => isPremiumAccess(p.access)));
         setFree(published.filter((p) => p.access === "Free"));
+
+        const isVideoPrompt = (p) =>
+          p.type === "Video" ||
+          (p.mediaUrl && /\.(mp4|webm|mov|ogg)$/i.test(p.mediaUrl)) ||
+          (p.category && p.category.toLowerCase().includes("video"));
+
+        const isImagePrompt = (p) =>
+          p.type === "Image" ||
+          (!p.type && (!p.mediaUrl || !/\.(mp4|webm|mov|ogg)$/i.test(p.mediaUrl))) ||
+          (!isVideoPrompt(p));
+
+        const allImages = published.filter(isImagePrompt);
+        // Shuffle random images (mix of Free, Pro, Team)
+        const shuffledImages = [...allImages].sort(() => Math.random() - 0.5);
+        setRandomPrompts(shuffledImages);
+
+        setVideoPrompts(published.filter(isVideoPrompt));
         setCategories(Array.isArray(categoryData) ? categoryData : []);
       } catch (err) {
         setError(err.message || "Could not load content.");
@@ -203,28 +278,37 @@ export default function Dashboard() {
       ) : (
         <>
           <CategoriesSection categories={categories} />
-          {showTrending && (
-            <PromptSection
-              title="Trending Prompts"
-              prompts={trending}
-              viewMoreTo="/trending"
-              alwaysShowViewMore
-              variant="portrait"
-              emptyText="No trending prompts yet. Upload and publish prompts in admin to see them here."
-            />
-          )}
+          <PromptSection
+            title="Trending Prompts"
+            prompts={trending}
+            viewMoreTo="/trending"
+            alwaysShowViewMore
+            variant="portrait"
+            emptyText="No published prompts yet. Assign Free, Pro, or Team in admin."
+          />
           <PromptSection
             title="Premium Prompts"
             prompts={premium}
             viewMoreTo="/browse?section=premium"
-            emptyText="No premium prompts yet."
+            emptyText="No premium prompts yet. Assign Pro or Team in admin."
           />
           <PromptSection
             title="Free Prompts"
             prompts={free}
             viewMoreTo="/browse?section=free"
             variant="portrait"
-            emptyText="No free prompts yet."
+            emptyText="No free prompts yet. Assign Free in admin."
+          />
+          <PromptSection
+            title="Video Prompts"
+            prompts={videoPrompts}
+            viewMoreTo="/browse?section=video"
+            variant="landscape"
+            emptyText="No video prompts yet. Add Video type prompts in admin."
+          />
+          <RandomPromptsGridSection
+            prompts={randomPrompts}
+            emptyText="No image prompts yet."
           />
         </>
       )}

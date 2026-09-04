@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disclaimer — PromptJump</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar" class="mobile-sidebar" aria-hidden="true">
+        <button type="button" class="mobile-sidebar-close" onclick="closeMobileNav()"
+            aria-label="Close menu">&times;</button>
+        <nav class="mobile-sidebar-nav">
+            <a href="index.html">Home</a>
+            <a href="explore.html">Explore</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="about.html">About</a>
+        </nav>
+        <div class="mobile-sidebar-actions">
+            <a href="login.html">Login</a>
+            <a href="signup.html" class="mobile-sidebar-cta">Start Free Trial</a>
+        </div>
+    </div>
+    <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileNav()"></div>
+
+    <!-- ================= Navbar ================= -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/logo.png" alt="Prompt Jump">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="explore.html">Explore</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+            <div class="nav-right">
+                <a href="login.html" class="login">Login</a>
+                <a href="signup.html" class="trial-btn">Start Free Trial</a>
+            </div>
+            <button type="button" class="mobile-menu-btn" onclick="openMobileNav()"
+                aria-label="Open menu">&#9776;</button>
+        </nav>
+    </header>
+
+    <!-- ================= Policy Content ================= -->
+    <section class="about-hero-section">
+        <span class="about-badge">✨ TRANSPARENCY FIRST</span>
+        <h1 class="about-hero-title"><span>Disclaimer</span></h1>
+        <p class="about-hero-sub">PromptJump — Last updated: 15/8/26</p>
+    </section>
+
+    <section class="about-mission-section">
+        <div class="policy-content" style="max-width: 900px; margin: 0 auto;">
+            <h2>1. General Information</h2>
+            <p>PromptJump ("we", "us", "our", the "Platform") is a prompt discovery platform. We organize prompts across
+                categories and display sample images and videos generated from those prompts, so you can browse and copy
+                prompt text for use in third-party AI tools. The content on this site is for general informational
+                purposes only.</p>
+
+            <h2>2. No Guarantee of Results</h2>
+            <p>Sample images and videos shown next to a prompt illustrate one possible result. Copying and running the
+                same prompt text in a third-party AI tool may produce different, inconsistent, or lower-quality results,
+                depending on the tool, its version, your settings, and other factors outside our control. We do not
+                guarantee that any prompt will reproduce the sample shown.</p>
+
+            <h2>3. We Don't Generate or Host Your Content</h2>
+            <p>PromptJump does not generate, process, store, or have access to any images, videos, or other files you
+                create using a copied prompt. All AI generation happens on third-party platforms, under their own terms,
+                pricing, and content policies. We are not responsible for the availability, accuracy, safety, or output
+                of any third-party AI tool.</p>
+
+            <h2>4. No Professional Advice</h2>
+            <p>Nothing on the Platform constitutes legal, financial, medical, or other professional advice. Use of
+                prompts and any resulting AI-generated output is at your own discretion and risk.</p>
+
+            <h2>5. Third-Party Tools and Links</h2>
+            <p>The Platform may reference, link to, or be used alongside third-party AI tools and websites. We do not
+                control and are not responsible for the content, accuracy, availability, or practices of any third-party
+                service.</p>
+
+            <h2>6. No Warranties</h2>
+            <p>The Platform is provided on an "as is" and "as available" basis, without warranties of any kind, express
+                or implied, including warranties of merchantability, fitness for a particular purpose, and
+                non-infringement.</p>
+
+            <h2>7. Limitation of Liability</h2>
+            <p>To the fullest extent permitted by law, PromptJump and its affiliates, officers, and employees are not
+                liable for any indirect, incidental, special, or consequential damages arising from your use of the
+                Platform or any content generated using a prompt copied from it.</p>
+
+            <h2>8. User Responsibility</h2>
+            <p>You are solely responsible for how you use any prompt copied from PromptJump, including compliance with
+                applicable laws and the terms of any third-party AI tool you use to run it.</p>
+
+            <h2>9. Changes to This Disclaimer</h2>
+            <p>We may update this Disclaimer at any time. Continued use of the Platform after changes are posted
+                constitutes acceptance of the updated Disclaimer.</p>
+
+            <h2>10. Contact Us</h2>
+            <p>Questions about this Disclaimer? Contact us at <a
+                    href="mailto:promptjumpsupport@gmail.com">promptjumpsupport@gmail.com</a>.</p>
+        </div>
+    </section>
+
+    <!-- ================= Footer ================= -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <img src="images/logo.png" class="footer-logo" alt="Prompt Jump">
+                <p>Discover premium AI prompts for ChatGPT, Midjourney, Kling, Runway, Images, Videos, UI Design, SEO,
+                    Coding and much more.</p>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="explore.html">Explore</a></li>
+                    <li><a href="pricing.html">Pricing</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms-of-service.html">Terms of Service</a></li>
+                    <li><a href="disclaimer.html">Disclaimer</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Feedback</h3>
+                <p>We'd love to hear your thoughts! Share your feedback and help us improve PromptJump.</p>
+                <a href="mailto:promptjumpsupport@gmail.com?subject=Feedback%20on%20PromptJump" class="support-email">
+                    <i class="fa-solid fa-comment-dots"></i> Send Feedback
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 Prompt Jump. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="mobile-nav.js"></script>
+
+</body>
+
+</html>

@@ -74,7 +74,7 @@ export default function TrendingPage() {
       ) : (
         <PromptGrid
           prompts={prompts}
-          emptyText="No trending image or video prompts yet."
+          emptyText="No published prompts yet. Assign Free, Pro, or Team in admin."
         />
       )}
     </div>

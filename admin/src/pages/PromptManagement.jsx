@@ -26,7 +26,7 @@ const emptyForm = {
   title: "",
   description: "",
   category: "General",
-  access: "Unassigned",
+  access: "Free",
   status: "Published",
 };
 
@@ -128,14 +128,22 @@ export default function PromptManagement() {
   }
 
   async function handleDelete(promptId) {
-    const ok = window.confirm("Delete this prompt?");
-    if (!ok) return;
+    if (!promptId) {
+      setError("The prompt ID is missing, so it cannot be deleted.");
+      return;
+    }
+
+    setError("");
+    const previousPrompts = prompts;
+    setPrompts((currentPrompts) =>
+      currentPrompts.filter((currentPrompt) => currentPrompt.id !== promptId)
+    );
 
     try {
       await api.deletePrompt(promptId);
-      await fetchPrompts();
     } catch (e) {
-      window.alert(e?.message || "Failed to delete prompt.");
+      setPrompts(previousPrompts);
+      setError(e?.message || "Failed to delete prompt.");
     }
   }
 
@@ -152,23 +160,53 @@ export default function PromptManagement() {
       }
 
       if (action === "trending") {
-        await api.setPromptTrending(prompt.id, !prompt.isTrending);
-        await fetchPrompts();
+        const previousPrompts = prompts;
+        setPrompts((currentPrompts) =>
+          currentPrompts.map((p) =>
+            p.id === prompt.id ? { ...p, isTrending: !p.isTrending } : p
+          )
+        );
+        try {
+          await api.setPromptTrending(prompt.id, !prompt.isTrending);
+        } catch (e) {
+          setPrompts(previousPrompts);
+          window.alert(e?.message || "Action failed.");
+        }
         return;
       }
 
       if (action === "archive") {
         const nextStatus = prompt.status === "Archived" ? "Published" : "Archived";
-        await api.setPromptStatus(prompt.id, nextStatus);
-        await fetchPrompts();
+        const previousPrompts = prompts;
+        setPrompts((currentPrompts) =>
+          currentPrompts.map((p) =>
+            p.id === prompt.id ? { ...p, status: nextStatus } : p
+          )
+        );
+        try {
+          await api.setPromptStatus(prompt.id, nextStatus);
+        } catch (e) {
+          setPrompts(previousPrompts);
+          window.alert(e?.message || "Action failed.");
+        }
         return;
       }
 
       if (action === "toggle") {
         const current = prompt.access === "Premium" ? "Pro" : prompt.access;
         const nextAccess = current === "Pro" ? "Free" : "Pro";
-        await api.setPromptAccess(prompt.id, nextAccess);
-        await fetchPrompts();
+        const previousPrompts = prompts;
+        setPrompts((currentPrompts) =>
+          currentPrompts.map((p) =>
+            p.id === prompt.id ? { ...p, access: nextAccess } : p
+          )
+        );
+        try {
+          await api.setPromptAccess(prompt.id, nextAccess);
+        } catch (e) {
+          setPrompts(previousPrompts);
+          window.alert(e?.message || "Action failed.");
+        }
       }
     } catch (e) {
       window.alert(e?.message || "Action failed.");
@@ -183,6 +221,51 @@ export default function PromptManagement() {
 
     setSaving(true);
     try {
+      let optimisticPrompt = null;
+      if (editingPrompt) {
+        optimisticPrompt = { ...editingPrompt };
+        if (mediaFile) {
+          optimisticPrompt.title = form.title || mediaFile.name;
+          optimisticPrompt.description = form.description;
+          optimisticPrompt.category = form.category;
+          optimisticPrompt.access = form.access;
+          optimisticPrompt.status = form.status;
+        } else {
+          optimisticPrompt.title = form.title;
+          optimisticPrompt.description = form.description;
+          optimisticPrompt.category = form.category;
+          optimisticPrompt.access = form.access;
+          optimisticPrompt.status = form.status;
+        }
+      } else {
+        optimisticPrompt = {
+          id: `temp_${Date.now()}`,
+          title: form.title || mediaFile?.name || "New prompt",
+          description: form.description,
+          category: form.category,
+          access: form.access,
+          status: form.status,
+          type: mediaFile?.type?.startsWith("video/") ? "Video" : "Image",
+          thumbnail: mediaPreview || "",
+          mediaUrl: mediaPreview || "",
+          views: 0,
+          downloads: 0,
+          likes: 0,
+          copies: 0,
+          tags: [],
+          createdAt: new Date().toISOString(),
+        };
+      }
+
+      setPrompts((currentPrompts) => {
+        if (editingPrompt) {
+          return currentPrompts.map((p) =>
+            p.id === editingPrompt.id ? { ...p, ...optimisticPrompt } : p
+          );
+        }
+        return [optimisticPrompt, ...currentPrompts];
+      });
+
       if (editingPrompt) {
         if (mediaFile) {
           const formData = new FormData();
@@ -217,6 +300,7 @@ export default function PromptManagement() {
       resetForm();
       await fetchPrompts();
     } catch (e) {
+      await fetchPrompts();
       window.alert(e?.message || "Failed to save prompt.");
     } finally {
       setSaving(false);
@@ -388,10 +472,10 @@ export default function PromptManagement() {
                     onChange={(e) => setForm((prev) => ({ ...prev, access: e.target.value }))}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   >
-                    <option value="Unassigned">Unassigned (not in Free/Pro/Team yet)</option>
                     <option value="Free">Free</option>
                     <option value="Pro">Pro</option>
                     <option value="Team">Team</option>
+                    <option value="Unassigned">Unassigned (not shown to users)</option>
                   </select>
                 </div>
 

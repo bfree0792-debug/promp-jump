@@ -1,5 +1,9 @@
-import express from 'express';
+const express = require('express');
+const router = express.Router();
 
-const router = express.Router()
+// Placeholder route for reservations if needed in the future
+router.get('/', (req, res) => {
+  res.json({ message: 'Reservation endpoint' });
+});
 
-e
+module.exports = router;
