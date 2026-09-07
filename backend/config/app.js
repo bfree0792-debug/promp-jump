@@ -31,6 +31,7 @@ const allowedOrigins = [
   'http://127.0.0.1:5173',
   'https://promp-jump.vercel.app',
   'https://promp-jump-fron.vercel.app',
+  'https://promp-jump-userpanel.vercel.app',
 ].filter(Boolean);
 
 app.use(
