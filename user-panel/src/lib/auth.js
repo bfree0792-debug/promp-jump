@@ -1,6 +1,6 @@
 const TOKEN_KEY = "promptgenieToken";
 const USER_KEY = "promptgenieUser";
-const LOGIN_URL = "/login.html";
+const LOGIN_URL = "https://promp-jump-fron.vercel.app/login.html";
 const USER_PANEL_URL = "";
 
 export function getStoredToken() {
