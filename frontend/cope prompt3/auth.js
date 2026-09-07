@@ -65,7 +65,7 @@ async function handleGoogleSuccess(authResponse) {
       user: JSON.stringify(result.user),
     });
 
-    window.location.href = `http://localhost:3001/?${params.toString()}`;
+    window.location.href = `https://promp-jump-userpanel.vercel.app/?${params.toString()}`;
   } catch (error) {
     console.error("Google Auth Error:", error);
     const activeForm = document.querySelector("#loginForm") || document.querySelector("#signupForm");
@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
           user: JSON.stringify(result.user),
         });
 
-        window.location.href = `http://localhost:3001/?${params.toString()}`;
+        window.location.href = `https://promp-jump-userpanel.vercel.app/?${params.toString()}`;
       } catch (error) {
         showAuthMessage(loginForm, error.message, "error");
       } finally {
