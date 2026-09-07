@@ -3,11 +3,11 @@ import react from "@vitejs/plugin-react";
 
 const apiProxy = {
   "/api": {
-    target: "http://127.0.0.1:4000",
+    target: "https://promp-jump-54.onrender.com",
     changeOrigin: true,
   },
   "/uploads": {
-    target: "http://127.0.0.1:4000",
+    target: "https://promp-jump-54.onrender.com",
     changeOrigin: true,
   },
 };

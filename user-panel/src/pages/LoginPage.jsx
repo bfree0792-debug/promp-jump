@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { saveAuthSession } from "../lib/auth";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://promp-jump-54.onrender.com";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");

@@ -1,6 +1,6 @@
 import { getStoredToken, getStoredUser } from "./auth";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://promp-jump-54.onrender.com";
 
 async function request(path, options = {}) {
   let response;

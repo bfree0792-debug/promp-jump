@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://promp-jump-54.onrender.com";
 const TOKEN_KEY = "promptjumpAdminToken";
 const USER_KEY = "promptjumpAdminUser";
 const LOCKOUT_KEY = "promptjump_admin_login_locked_until";

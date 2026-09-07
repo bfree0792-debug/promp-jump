@@ -1,4 +1,4 @@
-const API_BASE_URL = "";
+const API_BASE_URL = "https://promp-jump-54.onrender.com";
 
 function escapeHtml(value) {
   return String(value ?? "")
