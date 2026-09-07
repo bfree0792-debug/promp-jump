@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { saveAuthSession } from "../lib/auth";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +17,7 @@ export default function LoginPage() {
     setError("");
     setGoogleLoading(true);
     try {
-      const res = await fetch("/api/auth/google", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -47,7 +49,7 @@ export default function LoginPage() {
       try {
         let clientId = "";
         try {
-          const res = await fetch("/api/auth/google/client-id");
+          const res = await fetch(`${API_BASE_URL}/api/auth/google/client-id`);
           if (res.ok) {
             const data = await res.json();
             if (data.clientId) clientId = data.clientId;
@@ -127,7 +129,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
