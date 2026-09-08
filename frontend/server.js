@@ -70,8 +70,14 @@ const server = http.createServer((req, res) => {
       return;
     }
 
+    const extension = path.extname(requestedPath).toLowerCase();
+    const isHtml = extension === ".html";
+
     res.writeHead(200, {
       "Content-Type": types[path.extname(requestedPath).toLowerCase()] || "application/octet-stream",
+      "Cache-Control": isHtml
+        ? "no-cache"
+        : "public, max-age=3600, stale-while-revalidate=86400",
     });
     res.end(content);
   });

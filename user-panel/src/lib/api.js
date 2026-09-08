@@ -1,8 +1,33 @@
 import { getStoredToken, getStoredUser } from "./auth";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://promp-jump-54.onrender.com";
+const PUBLIC_CACHE_TTL_MS = 2 * 60 * 1000;
 
-async function request(path, options = {}) {
+function readPublicCache(path) {
+  try {
+    const cached = JSON.parse(localStorage.getItem(`promptjump:public:${path}`) || "null");
+    if (!cached || Date.now() - cached.timestamp > PUBLIC_CACHE_TTL_MS) return null;
+    return cached.data;
+  } catch {
+    return null;
+  }
+}
+
+function writePublicCache(path, data) {
+  try {
+    localStorage.setItem(
+      `promptjump:public:${path}`,
+      JSON.stringify({ timestamp: Date.now(), data }),
+    );
+  } catch {
+    // Caching is optional when browser storage is unavailable or full.
+  }
+}
+
+async function request(path, options = {}, cachePublic = false) {
+  const cached = cachePublic && options.method === undefined ? readPublicCache(path) : null;
+  if (cached !== null) return cached;
+
   let response;
 
   const headers = { ...(options.headers || {}) };
@@ -33,15 +58,16 @@ async function request(path, options = {}) {
     throw new Error(data.message || "Request failed.");
   }
 
+  if (cachePublic && options.method === undefined) writePublicCache(path, data);
   return data;
 }
 
 export const api = {
-  getPrompts: () => request("/api/prompts"),
-  getCategories: () => request("/api/categories"),
-  getTrending: () => request("/api/prompts/trending"),
-  getAnnouncements: () => request("/api/announcements"),
-  getPlans: () => request("/api/subscriptions"),
+  getPrompts: () => request("/api/prompts", {}, true),
+  getCategories: () => request("/api/categories", {}, true),
+  getTrending: () => request("/api/prompts/trending", {}, true),
+  getAnnouncements: () => request("/api/announcements", {}, true),
+  getPlans: () => request("/api/subscriptions", {}, true),
   getLibrary: (userId) => request(`/api/library/${userId}/library`),
   getUsage: (userId) => request(`/api/library/${userId}/usage`),
   getUserProfile: (userId) => request(`/api/users/${userId}`),

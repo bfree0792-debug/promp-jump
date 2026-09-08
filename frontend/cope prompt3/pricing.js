@@ -1,4 +1,29 @@
 const API_BASE_URL = "https://promp-jump-54.onrender.com";
+const PRICING_CACHE_KEY = "promptjumpPricingPlans";
+const PRICING_CACHE_TTL_MS = 5 * 60 * 1000;
+
+function readCachedPlans() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(PRICING_CACHE_KEY) || "null");
+    if (!cached || !Array.isArray(cached.plans) || Date.now() - cached.timestamp > PRICING_CACHE_TTL_MS) {
+      return null;
+    }
+    return cached.plans;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedPlans(plans) {
+  try {
+    localStorage.setItem(PRICING_CACHE_KEY, JSON.stringify({
+      timestamp: Date.now(),
+      plans,
+    }));
+  } catch {
+    // Caching is optional; rendering must still work when storage is unavailable.
+  }
+}
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -124,12 +149,39 @@ function bindPeriodToggle(plans, container) {
   toggle.onchange = () => render(toggle.checked);
 }
 
+function renderPricingPlans(plans, container, status) {
+  const activePlans = (Array.isArray(plans) ? plans : [])
+    .filter((p) => p.isActive !== false)
+    .sort((a, b) => {
+      const aPrice = a.monthlyPrice ?? a.yearlyPrice ?? a.price ?? 0;
+      const bPrice = b.monthlyPrice ?? b.yearlyPrice ?? b.price ?? 0;
+      return Number(aPrice) - Number(bPrice);
+    });
+
+  if (!activePlans.length) {
+    container.innerHTML = "";
+    if (status) {
+      status.textContent = "No subscription plans yet. Check back soon.";
+      status.style.display = "block";
+    }
+    return;
+  }
+
+  if (status) status.style.display = "none";
+  bindPeriodToggle(activePlans, container);
+}
+
 async function loadPricingPlans() {
   const container = document.getElementById("pricingCards");
   const status = document.getElementById("pricingStatus");
   if (!container) return;
 
-  if (status) {
+  const cachedPlans = readCachedPlans();
+  if (cachedPlans) {
+    renderPricingPlans(cachedPlans, container, status);
+  }
+
+  if (status && !cachedPlans) {
     status.style.display = "block";
     status.textContent = "Loading plans...";
   }
@@ -142,31 +194,17 @@ async function loadPricingPlans() {
       throw new Error(data.message || "Could not load plans.");
     }
 
-    const plans = (Array.isArray(data) ? data : [])
-      .filter((p) => p.isActive !== false)
-      .sort((a, b) => {
-        const aPrice = a.monthlyPrice ?? a.yearlyPrice ?? a.price ?? 0;
-        const bPrice = b.monthlyPrice ?? b.yearlyPrice ?? b.price ?? 0;
-        return Number(aPrice) - Number(bPrice);
-      });
-
-    if (!plans.length) {
-      container.innerHTML = "";
-      if (status) {
-        status.textContent = "No subscription plans yet. Check back soon.";
+    const plans = Array.isArray(data) ? data : [];
+    writeCachedPlans(plans);
+    renderPricingPlans(plans, container, status);
+  } catch (error) {
+    if (!cachedPlans) container.innerHTML = "";
+    if (status) {
+      if (!cachedPlans) {
+        status.textContent =
+          error.message || "Could not load subscription plans. Is the backend running?";
         status.style.display = "block";
       }
-      return;
-    }
-
-    if (status) status.style.display = "none";
-    bindPeriodToggle(plans, container);
-  } catch (error) {
-    container.innerHTML = "";
-    if (status) {
-      status.textContent =
-        error.message || "Could not load subscription plans. Is the backend running?";
-      status.style.display = "block";
     }
   }
 }
