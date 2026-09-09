@@ -71,9 +71,14 @@ create table if not exists users (
   daily_usage jsonb default '{"date": "", "imageCopies": 0, "videoCopies": 0}'::jsonb,
   reset_token text,
   reset_token_expiry timestamp with time zone,
+  admin_session_token text,
+  admin_session_expires_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()),
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
+
+alter table users add column if not exists admin_session_token text;
+alter table users add column if not exists admin_session_expires_at timestamp with time zone;
 
 -- 6. User Saved Prompts (Join Table)
 create table if not exists user_saved_prompts (

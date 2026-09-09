@@ -4,6 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const Category = require("../models/Category");
 const { adminRateLimiter } = require("../middlewares/rateLimiter");
+const { requireAdminSession } = require("../middlewares/adminSession");
 
 const router = express.Router();
 
@@ -38,7 +39,7 @@ router.get("/", async (_req, res) => {
   }
 });
 
-router.post("/", adminRateLimiter, upload.single("icon"), async (req, res) => {
+router.post("/", requireAdminSession, adminRateLimiter, upload.single("icon"), async (req, res) => {
   try {
     const { name, description } = req.body;
     if (!name || !name.trim()) {
@@ -67,7 +68,7 @@ router.post("/", adminRateLimiter, upload.single("icon"), async (req, res) => {
   }
 });
 
-router.patch("/:id", adminRateLimiter, upload.single("icon"), async (req, res) => {
+router.patch("/:id", requireAdminSession, adminRateLimiter, upload.single("icon"), async (req, res) => {
   try {
     const { name, description } = req.body;
     if (!name || !name.trim()) {
@@ -107,7 +108,7 @@ router.patch("/:id", adminRateLimiter, upload.single("icon"), async (req, res) =
   }
 });
 
-router.delete("/:id", adminRateLimiter, async (req, res) => {
+router.delete("/:id", requireAdminSession, adminRateLimiter, async (req, res) => {
   try {
     const categoryId = req.params.id;
     if (!categoryId || !String(categoryId).trim()) {

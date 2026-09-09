@@ -6,6 +6,7 @@ const User = require("../models/User");
 const Prompt = require("../models/Prompt");
 const SubscriptionPlan = require("../models/SubscriptionPlan");
 const { userRateLimiter, adminRateLimiter } = require("../middlewares/rateLimiter");
+const { requireAdminSession } = require("../middlewares/adminSession");
 
 const router = express.Router();
 
@@ -39,7 +40,7 @@ function normalizeUsername(username) {
     .replace(/[^a-z0-9_]/g, "");
 }
 
-router.get("/", adminRateLimiter, async (_req, res) => {
+router.get("/", requireAdminSession, adminRateLimiter, async (_req, res) => {
   try {
     const users = await User.find({ role: "user" }).sort({ createdAt: -1 });
     res.json(users.map((u) => u.toSafeJSON()));
@@ -48,7 +49,7 @@ router.get("/", adminRateLimiter, async (_req, res) => {
   }
 });
 
-router.get("/stats", adminRateLimiter, async (_req, res) => {
+router.get("/stats", requireAdminSession, adminRateLimiter, async (_req, res) => {
   try {
     const [active, inactive, free, pro, team, mostCopied] = await Promise.all([
       User.countDocuments({ role: "user", status: "active" }),
@@ -70,7 +71,7 @@ router.get("/stats", adminRateLimiter, async (_req, res) => {
   }
 });
 
-router.get("/revenue", adminRateLimiter, async (_req, res) => {
+router.get("/revenue", requireAdminSession, adminRateLimiter, async (_req, res) => {
   try {
     const users = await User.find({ role: "user" });
     const invoices = [];
@@ -288,7 +289,7 @@ router.post("/:id/avatar", userRateLimiter, uploadAvatar.single("avatar"), async
   }
 });
 
-router.patch("/:id/status", adminRateLimiter, async (req, res) => {
+router.patch("/:id/status", requireAdminSession, adminRateLimiter, async (req, res) => {
   try {
     const { status } = req.body;
     if (!["active", "inactive"].includes(status)) {

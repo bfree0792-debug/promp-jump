@@ -55,6 +55,8 @@ class UserModel {
     this.likedPrompts = (data.likedPrompts || []).map((id) => String(id));
     this.resetToken = data.resetToken || data.reset_token || null;
     this.resetTokenExpiry = data.resetTokenExpiry || data.reset_token_expiry || null;
+    this.adminSessionToken = data.adminSessionToken || data.admin_session_token || null;
+    this.adminSessionExpiresAt = data.adminSessionExpiresAt || data.admin_session_expires_at || null;
     this.createdAt = data.createdAt || data.created_at || new Date().toISOString();
     this.updatedAt = data.updatedAt || data.updated_at || new Date().toISOString();
   }
@@ -100,6 +102,8 @@ class UserModel {
       daily_usage: this.dailyUsage,
       reset_token: this.resetToken,
       reset_token_expiry: this.resetTokenExpiry,
+      admin_session_token: this.adminSessionToken,
+      admin_session_expires_at: this.adminSessionExpiresAt,
       updated_at: new Date().toISOString(),
     };
 
@@ -258,6 +262,9 @@ User.findOne = async function (filter = {}) {
   if (filter.resetTokenExpiry && filter.resetTokenExpiry.$gt) {
     query = query.gt("reset_token_expiry", new Date().toISOString());
   }
+  if (filter.adminSessionToken) {
+    query = query.eq("admin_session_token", String(filter.adminSessionToken).trim());
+  }
   if (filter._id && filter._id.$ne) {
     query = query.neq("id", String(filter._id.$ne).trim());
   }
@@ -290,6 +297,8 @@ User.findByIdAndUpdate = async function (id, updates = {}) {
   if (updates.likedPrompts !== undefined) user.likedPrompts = updates.likedPrompts;
   if (updates.resetToken !== undefined) user.resetToken = updates.resetToken;
   if (updates.resetTokenExpiry !== undefined) user.resetTokenExpiry = updates.resetTokenExpiry;
+  if (updates.adminSessionToken !== undefined) user.adminSessionToken = updates.adminSessionToken;
+  if (updates.adminSessionExpiresAt !== undefined) user.adminSessionExpiresAt = updates.adminSessionExpiresAt;
 
   await user.save();
   return user;

@@ -1,6 +1,7 @@
 const express = require("express");
 const SubscriptionPlan = require("../models/SubscriptionPlan");
 const { adminRateLimiter } = require("../middlewares/rateLimiter");
+const { requireAdminSession } = require("../middlewares/adminSession");
 
 const router = express.Router();
 
@@ -42,7 +43,7 @@ router.get("/", async (_req, res) => {
   }
 });
 
-router.post("/", adminRateLimiter, async (req, res) => {
+router.post("/", requireAdminSession, adminRateLimiter, async (req, res) => {
   try {
     const { name, monthlyPrice, yearlyPrice, price, billingPeriod, features, limits } = req.body;
 
@@ -90,7 +91,7 @@ router.post("/", adminRateLimiter, async (req, res) => {
   }
 });
 
-router.patch("/:id", adminRateLimiter, async (req, res) => {
+router.patch("/:id", requireAdminSession, adminRateLimiter, async (req, res) => {
   try {
     const plan = await SubscriptionPlan.findById(req.params.id);
     if (!plan) {
@@ -156,7 +157,7 @@ router.patch("/:id", adminRateLimiter, async (req, res) => {
   }
 });
 
-router.delete("/:id", adminRateLimiter, async (req, res) => {
+router.delete("/:id", requireAdminSession, adminRateLimiter, async (req, res) => {
   try {
     const deleted = await SubscriptionPlan.findByIdAndDelete(req.params.id);
     if (!deleted) {

@@ -1,6 +1,7 @@
 const express = require("express");
 const Announcement = require("../models/Announcement");
 const { adminRateLimiter } = require("../middlewares/rateLimiter");
+const { requireAdminSession } = require("../middlewares/adminSession");
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", adminRateLimiter, async (req, res) => {
+router.post("/", requireAdminSession, adminRateLimiter, async (req, res) => {
   try {
     const { title, message, audience, status } = req.body;
 
@@ -41,7 +42,7 @@ router.post("/", adminRateLimiter, async (req, res) => {
   }
 });
 
-router.patch("/:id", adminRateLimiter, async (req, res) => {
+router.patch("/:id", requireAdminSession, adminRateLimiter, async (req, res) => {
   try {
     const announcement = await Announcement.findById(req.params.id);
     if (!announcement) {
@@ -74,7 +75,7 @@ router.patch("/:id", adminRateLimiter, async (req, res) => {
   }
 });
 
-router.delete("/:id", adminRateLimiter, async (req, res) => {
+router.delete("/:id", requireAdminSession, adminRateLimiter, async (req, res) => {
   try {
     const deleted = await Announcement.findByIdAndDelete(req.params.id);
     if (!deleted) {

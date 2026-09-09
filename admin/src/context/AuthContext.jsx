@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import {
   adminLogin,
+  adminLogout,
   clearAuthSession,
   getStoredToken,
   getStoredUser,
@@ -21,7 +22,12 @@ export function AuthProvider({ children }) {
     return result;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await adminLogout();
+    } catch {
+      // Always clear the local session even if the API is unavailable.
+    }
     clearAuthSession();
     setToken(null);
     setUser(null);

@@ -31,6 +31,16 @@ export function clearAuthSession() {
   localStorage.removeItem(USER_KEY);
 }
 
+export async function adminLogout() {
+  const token = getStoredToken();
+  if (!token) return;
+
+  await fetch(`${API_BASE_URL}/api/auth/admin/logout`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
 export function getAdminLockoutUntil() {
   const value = localStorage.getItem(LOCKOUT_KEY);
   if (!value) return null;

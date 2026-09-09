@@ -4,6 +4,7 @@ const { OAuth2Client } = require("google-auth-library");
 const User = require("../models/User");
 const { sendPasswordResetEmail } = require("../utils/email");
 const { authRateLimiter, adminRateLimiter, passwordResetLimiter } = require("../middlewares/rateLimiter");
+const { requireAdminSession } = require("../middlewares/adminSession");
 
 const router = express.Router();
 
@@ -179,14 +180,40 @@ router.post("/admin/login", adminRateLimiter, async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
+    const activeSessionExpiresAt = user.adminSessionExpiresAt
+      ? new Date(user.adminSessionExpiresAt).getTime()
+      : 0;
+    if (user.adminSessionToken && activeSessionExpiresAt > Date.now()) {
+      return res.status(409).json({
+        message: "Admin is already signed in on another device.",
+      });
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    user.adminSessionToken = token;
+    user.adminSessionExpiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000);
+    await user.save();
+
     return res.json({
       message: "Admin login successful.",
-      token: crypto.randomBytes(24).toString("hex"),
+      token,
       user: user.toSafeJSON(),
     });
   } catch (error) {
     console.error("Admin login error:", error);
     return res.status(500).json({ message: "Could not log in. Please try again." });
+  }
+});
+
+router.post("/admin/logout", requireAdminSession, async (req, res) => {
+  try {
+    req.adminUser.adminSessionToken = null;
+    req.adminUser.adminSessionExpiresAt = null;
+    await req.adminUser.save();
+    return res.json({ message: "Admin logged out successfully." });
+  } catch (error) {
+    console.error("Admin logout error:", error);
+    return res.status(500).json({ message: "Could not log out admin session." });
   }
 });
 
