@@ -69,6 +69,19 @@ export default function PromptManagement() {
     setCategoryFilter(searchParams.get("category") || "all");
   }, [searchParams]);
 
+  useEffect(() => {
+    const editId = searchParams.get("edit");
+    if (!editId || prompts.length === 0) return;
+
+    const prompt = prompts.find((item) => (item.id || item._id) === editId);
+    if (!prompt) return;
+
+    openEdit(prompt);
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("edit");
+    setSearchParams(nextParams, { replace: true });
+  }, [prompts, searchParams, setSearchParams]);
+
   const filteredPrompts = useMemo(
     () =>
       prompts.filter((prompt) => {

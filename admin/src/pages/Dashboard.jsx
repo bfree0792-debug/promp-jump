@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import TierCard from "../components/TierCard";
 import StatCard from "../components/StatCard";
 import ContentTierSection from "../components/ContentTierSection";
@@ -31,6 +31,7 @@ const tierMeta = [
 ];
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [prompts, setPrompts] = useState([]);
   const [counts, setCounts] = useState({ Free: 0, Pro: 0, Team: 0 });
   const [activeTier, setActiveTier] = useState("Free");
@@ -102,6 +103,59 @@ export default function Dashboard() {
     },
   ];
 
+  async function handlePromptAction(action, prompt) {
+    const promptId = prompt.id || prompt._id;
+    if (!promptId) return;
+
+    if (action === "edit") {
+      navigate(`/prompts?edit=${encodeURIComponent(promptId)}`);
+      return;
+    }
+
+    if (action === "delete") {
+      if (!window.confirm(`Delete prompt "${prompt.title}"?`)) return;
+      const previousPrompts = prompts;
+      setPrompts((current) => current.filter((item) => (item.id || item._id) !== promptId));
+      try {
+        await api.deletePrompt(promptId);
+      } catch (error) {
+        setPrompts(previousPrompts);
+        window.alert(error.message || "Could not delete prompt.");
+      }
+      return;
+    }
+
+    const previousPrompts = prompts;
+    let update;
+    let save;
+
+    if (action === "trending") {
+      update = { isTrending: !prompt.isTrending };
+      save = api.setPromptTrending(promptId, update.isTrending);
+    } else if (action === "archive") {
+      update = { status: prompt.status === "Archived" ? "Published" : "Archived" };
+      save = api.setPromptStatus(promptId, update.status);
+    } else if (action === "toggle") {
+      update = { access: prompt.access === "Premium" || prompt.access === "Pro" ? "Free" : "Pro" };
+      save = api.setPromptAccess(promptId, update.access);
+    } else {
+      return;
+    }
+
+    setPrompts((current) =>
+      current.map((item) =>
+        (item.id || item._id) === promptId ? { ...item, ...update } : item
+      )
+    );
+
+    try {
+      await save;
+    } catch (error) {
+      setPrompts(previousPrompts);
+      window.alert(error.message || "Action failed.");
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -135,6 +189,7 @@ export default function Dashboard() {
           likes: String(p.likes ?? 0),
           access: p.access === "Pro" ? "Premium" : p.access,
         }))}
+        onAction={handlePromptAction}
       />
     </div>
   );
