@@ -16,5 +16,35 @@ body {
 
 html.dark body {
   background-color: #0f172a;
-  color: #e2e8f0;
+  color: #ffffff;
+}
+
+html.dark #root {
+  color: #ffffff;
+}
+
+/* Keep legacy user-panel screens readable when dark mode is enabled. */
+html.dark [class*="text-slate-"],
+html.dark [class*="text-gray-"],
+html.dark [class*="text-neutral-"],
+html.dark [class*="text-zinc-"],
+html.dark [class*="text-stone-"],
+html.dark [class*="text-black"],
+html.dark [class*="text-indigo-"],
+html.dark [class*="text-blue-"],
+html.dark [class*="text-emerald-"],
+html.dark [class*="text-green-"],
+html.dark [class*="text-red-"],
+html.dark [class*="text-rose-"],
+html.dark [class*="text-amber-"],
+html.dark [class*="text-orange-"],
+html.dark [class*="text-violet-"],
+html.dark [class*="text-pink-"],
+html.dark [class*="text-sky-"] {
+  color: #ffffff !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #cbd5e1;
 }
