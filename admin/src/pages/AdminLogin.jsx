@@ -36,6 +36,7 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
+  const [isSessionConflict, setIsSessionConflict] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Lockout & Security challenge state
@@ -124,6 +125,7 @@ export default function AdminLogin() {
     if (isBlocked || isChallengeRequired) return;
 
     setError("");
+    setIsSessionConflict(false);
     setLoading(true);
 
     try {
@@ -135,6 +137,12 @@ export default function AdminLogin() {
       setIsChallengeRequired(false);
       navigate("/dashboard", { replace: true });
     } catch (err) {
+      if (err.status === 409) {
+        setIsSessionConflict(true);
+        setError(err.message || "Admin is already signed in on another device.");
+        return;
+      }
+
       const is429 = err.status === 429;
       const nextAttempts = failedAttempts + 1;
 
@@ -421,7 +429,13 @@ export default function AdminLogin() {
                 </div>
 
                 {error && !isBlocked && (
-                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  <div
+                    className={`rounded-xl border px-4 py-3 text-sm ${
+                      isSessionConflict
+                        ? "border-amber-200 bg-amber-50 text-amber-700"
+                        : "border-red-200 bg-red-50 text-red-600"
+                    }`}
+                  >
                     {error}
                   </div>
                 )}
