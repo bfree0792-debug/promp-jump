@@ -18,6 +18,9 @@ const libraryRoute = require('../routers/libraryRoute');
 
 const app = express();
 
+// Render sits behind a trusted reverse proxy and forwards the client IP.
+app.set('trust proxy', 1);
+
 const allowedOrigins = [
   ...(process.env.FRONTEND_URL || '')
     .split(',')
