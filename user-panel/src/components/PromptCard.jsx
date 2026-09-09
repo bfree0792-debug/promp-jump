@@ -412,20 +412,6 @@ export function PromptModal({ prompt, onClose }) {
             </div>
           </div>
 
-          <div className="mt-5 rounded-xl bg-slate-50 border border-slate-100 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">
-              Prompt / Description
-            </p>
-            {limitReached ? (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-                Daily limit reached. Please update your plan to continue.
-              </div>
-            ) : (
-              <p className="text-sm text-slate-700 whitespace-pre-wrap">
-                {prompt.description || "No description provided."}
-              </p>
-            )}
-          </div>
         </div>
       </div>
     </div>
