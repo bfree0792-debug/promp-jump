@@ -77,6 +77,7 @@ const Prompt = {
       }
     }
     if (filter.status) query = query.eq("status", filter.status);
+    if (filter.isTrending !== undefined) query = query.eq("is_trending", Boolean(filter.isTrending));
     if (filter._id && filter._id.$in) {
       const ids = (filter._id.$in || []).filter(Boolean).map(String);
       if (ids.length === 0) {

@@ -47,7 +47,11 @@ router.get("/", async (req, res) => {
 
 router.get("/trending", async (_req, res) => {
   try {
-    const prompts = await Prompt.find({ status: "Published", access: { $ne: "Unassigned" } })
+    const prompts = await Prompt.find({
+      status: "Published",
+      access: { $ne: "Unassigned" },
+      isTrending: true,
+    })
       .sort({ isTrending: -1, likes: -1, copies: -1 })
       .limit(50);
     res.json(prompts.map((p) => p.toJSON()));
