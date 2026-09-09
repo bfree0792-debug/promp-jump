@@ -17,9 +17,9 @@ function getTransporter() {
   }
 
   transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // use SSL
+    host: String(process.env.EMAIL_SMTP_HOST || "smtp.gmail.com").trim(),
+    port: Number(process.env.EMAIL_SMTP_PORT || 465),
+    secure: String(process.env.EMAIL_SMTP_SECURE || "true").toLowerCase() === "true",
     auth: {
       user: String(process.env.EMAIL_USER || "").trim(),
       pass: String(process.env.EMAIL_PASS || "").replace(/\s+/g, ""),

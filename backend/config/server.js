@@ -13,6 +13,10 @@ app.listen(port, async () => {
   console.log(`Backend running at http://localhost:${port}`);
   try {
     await verifyEmailConfig();
+  } catch (err) {
+    console.warn("Email configuration check notice:", err.message);
+  }
+  try {
     await seedDefaults();
   } catch (err) {
     console.warn("Seed defaults check notice:", err.message);
