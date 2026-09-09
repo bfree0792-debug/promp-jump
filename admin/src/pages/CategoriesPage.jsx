@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Trash2, FolderKanban, ImagePlus } from "lucide-react";
+import { Plus, Trash2, FolderKanban, ImagePlus, Pencil, X } from "lucide-react";
 import { api, mediaUrl } from "../lib/api";
 
 export default function CategoriesPage() {
@@ -10,6 +10,8 @@ export default function CategoriesPage() {
   const [iconPreview, setIconPreview] = useState("");
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
   async function load() {
@@ -33,9 +35,19 @@ export default function CategoriesPage() {
     setDescription("");
     setIconFile(null);
     setIconPreview("");
+    setEditingCategory(null);
   }
 
-  async function handleCreate(e) {
+  function startEditing(category) {
+    setEditingCategory(category);
+    setName(category.name || "");
+    setDescription(category.description || "");
+    setIconFile(null);
+    setIconPreview(category.iconUrl ? mediaUrl(category.iconUrl) : "");
+    setStatusMessage(null);
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
     setStatusMessage(null);
 
@@ -53,24 +65,34 @@ export default function CategoriesPage() {
       iconUrl: iconPreview || "",
     };
 
-    setCategories((current) => [optimisticCategory, ...current]);
-    resetForm();
+    setSaving(true);
 
     try {
-      await api.createCategory(formData);
-      setStatusMessage({ type: "success", text: "Category created successfully." });
+      if (editingCategory) {
+        await api.updateCategory(editingCategory.id || editingCategory._id, formData);
+        setStatusMessage({ type: "success", text: "Category updated successfully." });
+      } else {
+        setCategories((current) => [optimisticCategory, ...current]);
+        await api.createCategory(formData);
+        setStatusMessage({ type: "success", text: "Category created successfully." });
+      }
+      resetForm();
       await load();
     } catch (error) {
-      setCategories((current) =>
-        current.filter((c) => c.id !== optimisticCategory.id)
-      );
+      if (!editingCategory) {
+        setCategories((current) => current.filter((c) => c.id !== optimisticCategory.id));
+      }
       setStatusMessage({ type: "error", text: error.message || "Failed to create category." });
+    } finally {
+      setSaving(false);
     }
   }
 
   async function handleDelete(category) {
     const id = typeof category === "object" ? (category.id || category._id) : category;
     const catName = typeof category === "object" ? category.name : "this category";
+
+    if (!window.confirm(`Delete category "${catName}"?`)) return;
 
     if (!id) {
       setStatusMessage({ type: "error", text: "Category ID is missing." });
@@ -112,12 +134,14 @@ export default function CategoriesPage() {
       )}
 
       <form
-        onSubmit={handleCreate}
+        onSubmit={handleSubmit}
         className="bg-white rounded-xl border border-slate-100 shadow-card p-5 space-y-4"
       >
         <div className="flex items-center gap-2">
           <FolderKanban className="w-5 h-5 text-blue-600" />
-          <h2 className="text-[15px] font-bold text-slate-800">Create Category</h2>
+          <h2 className="text-[15px] font-bold text-slate-800">
+            {editingCategory ? "Edit Category" : "Create Category"}
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -175,11 +199,22 @@ export default function CategoriesPage() {
 
         <button
           type="submit"
+          disabled={saving}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700"
         >
-          <Plus className="w-4 h-4" />
-          Create Category
+          {editingCategory ? <Pencil className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+          {saving ? "Saving..." : editingCategory ? "Save Changes" : "Create Category"}
         </button>
+        {editingCategory && (
+          <button
+            type="button"
+            onClick={resetForm}
+            className="ml-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50"
+          >
+            <X className="w-4 h-4" />
+            Cancel
+          </button>
+        )}
       </form>
 
       <div className="bg-white rounded-xl border border-slate-100 shadow-card overflow-hidden">
@@ -213,19 +248,29 @@ export default function CategoriesPage() {
                       </p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    disabled={isDeleting}
-                    onClick={() => handleDelete(c)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold shrink-0 transition-colors ${
-                      isDeleting
-                        ? "border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed"
-                        : "border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-                    }`}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    {isDeleting ? "Deleting..." : "Delete"}
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => startEditing(c)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-blue-200 text-blue-600 text-xs font-semibold hover:bg-blue-50"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isDeleting}
+                      onClick={() => handleDelete(c)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold ${
+                        isDeleting
+                          ? "border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed"
+                          : "border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                      }`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      {isDeleting ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
                 </div>
               );
             })}

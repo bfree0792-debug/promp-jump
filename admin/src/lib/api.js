@@ -100,6 +100,8 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  updateCategory: (id, payload) =>
+    request(`/api/categories/${id}`, { method: "PATCH", body: payload }),
   deleteCategory: (id) => request(`/api/categories/${id}`, { method: "DELETE" }),
   getPlans: () => request("/api/subscriptions"),
   createPlan: (payload) =>

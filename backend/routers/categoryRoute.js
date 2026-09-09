@@ -67,6 +67,46 @@ router.post("/", adminRateLimiter, upload.single("icon"), async (req, res) => {
   }
 });
 
+router.patch("/:id", adminRateLimiter, upload.single("icon"), async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: "Category name is required." });
+    }
+
+    const current = await Category.findById(req.params.id);
+    if (!current) {
+      return res.status(404).json({ message: "Category not found." });
+    }
+
+    const updates = {
+      name: name.trim(),
+      description: description || "",
+    };
+    if (req.file) {
+      updates.icon_url = `/uploads/categories/${req.file.filename}`;
+    }
+
+    const category = await Category.findByIdAndUpdate(req.params.id, updates);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found." });
+    }
+
+    if (req.file && current.iconUrl) {
+      try {
+        const oldPath = path.join(uploadDir, path.basename(String(current.iconUrl)));
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      } catch {
+        // ignore cleanup errors
+      }
+    }
+
+    res.json(category.toJSON());
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Could not update category." });
+  }
+});
+
 router.delete("/:id", adminRateLimiter, async (req, res) => {
   try {
     const categoryId = req.params.id;

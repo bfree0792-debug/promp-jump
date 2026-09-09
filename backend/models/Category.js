@@ -112,6 +112,25 @@ const Category = {
     return formatCategory(data);
   },
 
+  async findByIdAndUpdate(id, updates) {
+    const existing = await Category.findById(id);
+    if (!existing) return null;
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      String(existing.id).trim()
+    );
+    let updateQuery = supabase.from("categories").update(updates);
+    if (isUuid) {
+      updateQuery = updateQuery.eq("id", existing.id);
+    } else {
+      updateQuery = updateQuery.eq("name", existing.name);
+    }
+
+    const { data, error } = await updateQuery.select().single();
+    if (error) throw error;
+    return data ? formatCategory(data) : null;
+  },
+
   async findByIdAndDelete(id) {
     if (!id) return null;
     const existing = await Category.findById(id);
