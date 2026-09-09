@@ -342,9 +342,7 @@ router.post("/forgot-password", passwordResetLimiter, async (req, res) => {
       console.error("Failed to send password reset email:", emailError.message);
 
       return res.status(503).json({
-        message: "We could not send the reset email because the email provider is currently unavailable. Please use the reset link below or contact support.",
-        smtpFailure: true,
-        resetLink,
+        message: "We could not send the reset email because the email provider is currently unavailable. Please try again later or contact support.",
       });
     }
 
