@@ -297,8 +297,15 @@ router.post("/forgot-password", passwordResetLimiter, async (req, res) => {
     await user.save();
 
     // Send the reset link via email
+    const configuredFrontendUrl = String(process.env.FRONTEND_URL || "").trim();
+    const isProduction = process.env.NODE_ENV === "production";
+    const usesLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(
+      configuredFrontendUrl.replace(/\/$/, "")
+    );
     const frontendUrl = (
-      process.env.FRONTEND_URL || "https://promp-jump-userpanel.vercel.app"
+      isProduction && usesLocalhost
+        ? "https://promp-jump-userpanel.vercel.app"
+        : configuredFrontendUrl || "https://promp-jump-userpanel.vercel.app"
     ).replace(/\/$/, "");
     const resetLink = `${frontendUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
