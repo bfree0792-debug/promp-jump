@@ -85,7 +85,16 @@ const adminLoginLimiter = createLimiter({
 const passwordResetLimiter = createLimiter({
   windowMs: Number(process.env.PASSWORD_RESET_RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000), // 15 minutes
   max: Number(process.env.PASSWORD_RESET_RATE_LIMIT_MAX || 5), // 5 requests / 15 min
-  message: "Too many password reset requests. Please wait before requesting another reset email.",
+  keyGenerator: (req) => {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const token = String(req.body?.token || "").trim();
+
+    if (email) return `password-reset-email_${email}`;
+    if (token) return `password-reset-token_${token}`;
+
+    return req.ip || req.socket?.remoteAddress || "unknown-reset-ip";
+  },
+  message: "Too many password reset requests for this account. Please wait before trying again.",
 });
 
 module.exports = {
