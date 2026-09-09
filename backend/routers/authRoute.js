@@ -297,7 +297,10 @@ router.post("/forgot-password", passwordResetLimiter, async (req, res) => {
     await user.save();
 
     // Send the reset link via email
-    const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password.html?token=${resetToken}`;
+    const frontendUrl = (
+      process.env.FRONTEND_URL || "https://promp-jump-userpanel.vercel.app"
+    ).replace(/\/$/, "");
+    const resetLink = `${frontendUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
     try {
       await sendPasswordResetEmail(user.email, resetLink);
