@@ -24,6 +24,7 @@ function getTransporter() {
       user: String(process.env.EMAIL_USER || "").trim(),
       pass: String(process.env.EMAIL_PASS || "").replace(/\s+/g, ""),
     },
+    family: Number(process.env.EMAIL_SMTP_FAMILY || 4),
     connectionTimeout: 15000,
     greetingTimeout: 15000,
     socketTimeout: 15000,
