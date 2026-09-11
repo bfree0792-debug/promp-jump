@@ -60,8 +60,14 @@ async function sendViaResend({ to, subject, html }) {
   }
 
   const rawFrom = String(process.env.EMAIL_FROM || "").trim();
-  // Resend default verified testing sender if user doesn't have a custom domain yet
-  const from = rawFrom || "PromptJump <onboarding@resend.dev>";
+  // Resend requires a verified custom domain. If the configured EMAIL_FROM uses an unverified
+  // public webmail domain (like @gmail.com, @yahoo.com, etc.), fall back to Resend's default onboarding sender.
+  const isPublicWebmail = /@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|icloud\.com)>/i.test(rawFrom) ||
+    /@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|icloud\.com)$/i.test(rawFrom);
+
+  const from = (!rawFrom || isPublicWebmail)
+    ? "PromptJump <onboarding@resend.dev>"
+    : rawFrom;
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",

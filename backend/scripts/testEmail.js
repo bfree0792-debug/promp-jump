@@ -41,7 +41,11 @@ async function main() {
   if (resendApiKey) {
     console.log("Using Resend HTTPS API test...");
     const rawFrom = String(process.env.EMAIL_FROM || "").trim();
-    const from = rawFrom || "PromptJump <onboarding@resend.dev>";
+    const isPublicWebmail = /@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|icloud\.com)>/i.test(rawFrom) ||
+      /@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|icloud\.com)$/i.test(rawFrom);
+    const from = (!rawFrom || isPublicWebmail)
+      ? "PromptJump <onboarding@resend.dev>"
+      : rawFrom;
     if (to) {
       console.log(`Sending a test email to ${to} via Resend...`);
       const res = await fetch("https://api.resend.com/emails", {
