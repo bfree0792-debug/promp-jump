@@ -1,6 +1,16 @@
 const nodemailer = require("nodemailer");
+const dns = require("dns");
+
+// Prefer IPv4 resolution in environments (like Render or cloud containers) where IPv6 is not routed
+if (typeof dns.setDefaultResultOrder === "function") {
+  dns.setDefaultResultOrder("ipv4first");
+}
 
 let transporter = null;
+
+function getResendApiKey() {
+  return String(process.env.RESEND_API_KEY || "").trim();
+}
 
 /**
  * Lazily create the transporter the first time it's needed.
@@ -16,10 +26,15 @@ function getTransporter() {
     return transporter;
   }
 
+  const port = Number(process.env.EMAIL_SMTP_PORT || 465);
+  const secure = process.env.EMAIL_SMTP_SECURE !== undefined
+    ? String(process.env.EMAIL_SMTP_SECURE).toLowerCase() === "true"
+    : port === 465;
+
   transporter = nodemailer.createTransport({
     host: String(process.env.EMAIL_SMTP_HOST || "smtp.gmail.com").trim(),
-    port: Number(process.env.EMAIL_SMTP_PORT || 465),
-    secure: String(process.env.EMAIL_SMTP_SECURE || "true").toLowerCase() === "true",
+    port,
+    secure,
     auth: {
       user: String(process.env.EMAIL_USER || "").trim(),
       pass: String(process.env.EMAIL_PASS || "").replace(/\s+/g, ""),
@@ -34,13 +49,60 @@ function getTransporter() {
 }
 
 /**
+ * Send an email via Resend's HTTPS REST API.
+ * Uses standard Node.js global fetch (port 443 HTTPS), which is NEVER blocked
+ * by cloud providers like Render Free tier.
+ */
+async function sendViaResend({ to, subject, html }) {
+  const apiKey = getResendApiKey();
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY is not configured.");
+  }
+
+  const rawFrom = String(process.env.EMAIL_FROM || "").trim();
+  // Resend default verified testing sender if user doesn't have a custom domain yet
+  const from = rawFrom || "PromptJump <onboarding@resend.dev>";
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+
+  const responseData = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const errorMsg =
+      responseData?.message ||
+      responseData?.error ||
+      `HTTP ${response.status} ${response.statusText}`;
+    throw new Error(`Resend API error: ${errorMsg}`);
+  }
+
+  return responseData;
+}
+
+/**
  * Verify the transporter credentials once at startup so SMTP auth errors
  * surface immediately instead of failing silently on the first reset attempt.
  */
 async function verifyEmailConfig() {
+  if (getResendApiKey()) {
+    console.log("[email] RESEND_API_KEY detected. Using Resend HTTPS API (Render Free tier compatible).");
+    return true;
+  }
+
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.warn(
-      "[email] EMAIL_USER / EMAIL_PASS not set. Password reset emails will not be sent."
+      "[email] Neither RESEND_API_KEY nor EMAIL_USER/EMAIL_PASS is set. Password reset emails will not be sent."
     );
     return false;
   }
@@ -51,11 +113,19 @@ async function verifyEmailConfig() {
     return true;
   } catch (error) {
     console.error("[email] SMTP verification failed:", error.message);
-    console.error(
-      "[email] If using Gmail, EMAIL_PASS must be a 16-character App Password " +
-        "(not your normal Gmail password). Generate one at " +
-        "https://myaccount.google.com/apppasswords after enabling 2-Step Verification."
-    );
+    if (error.code === "ENETUNREACH" || error.code === "ETIMEDOUT") {
+      console.error(
+        "[email] NOTICE: Render Free tier blocks outbound SMTP ports 25, 465, and 587.\n" +
+        "[email] To send emails on Render Free tier, sign up for a free account at https://resend.com and set RESEND_API_KEY in your Render environment variables.\n" +
+        "[email] Alternatively, upgrade your Render service to Starter (paid) to unblock SMTP ports."
+      );
+    } else {
+      console.error(
+        "[email] If using Gmail, EMAIL_PASS must be a 16-character App Password " +
+          "(not your normal Gmail password). Generate one at " +
+          "https://myaccount.google.com/apppasswords after enabling 2-Step Verification."
+      );
+    }
     return false;
   }
 }
@@ -102,6 +172,15 @@ async function sendPasswordResetEmail(to, resetLink) {
       </div>
     `,
   };
+
+  if (getResendApiKey()) {
+    await sendViaResend({
+      to,
+      subject: mailOptions.subject,
+      html: mailOptions.html,
+    });
+    return;
+  }
 
   await getTransporter().sendMail(mailOptions);
 }

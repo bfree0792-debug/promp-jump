@@ -11,6 +11,11 @@
 const path = require("path");
 const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
+const dns = require("dns");
+
+if (typeof dns.setDefaultResultOrder === "function") {
+  dns.setDefaultResultOrder("ipv4first");
+}
 
 dotenv.config({ path: path.join(__dirname, "../config/config.env"), quiet: true });
 
@@ -21,16 +26,51 @@ function looksLikeAppPassword(pass) {
 
 async function main() {
   const to = process.argv[2];
+  const resendApiKey = process.env.RESEND_API_KEY;
   const user = process.env.EMAIL_USER;
   const pass = process.env.EMAIL_PASS;
 
   console.log("=== Email Diagnostics ===");
-  console.log("EMAIL_USER:", user || "NOT SET");
-  console.log("EMAIL_PASS :", pass ? (looksLikeAppPassword(pass) ? pass + " (looks like a valid App Password)" : `${pass}  *** NOT a valid App Password (must be 16 lowercase letters)`) : "NOT SET");
+  if (resendApiKey) {
+    console.log("RESEND_API_KEY : Configured (Render Free Tier compatible)");
+  }
+  console.log("EMAIL_USER     :", user || "NOT SET");
+  console.log("EMAIL_PASS     :", pass ? (looksLikeAppPassword(pass) ? pass + " (looks like a valid App Password)" : `${pass}  *** NOT a valid App Password (must be 16 lowercase letters)`) : "NOT SET");
   console.log("");
 
+  if (resendApiKey) {
+    console.log("Using Resend HTTPS API test...");
+    const rawFrom = String(process.env.EMAIL_FROM || "").trim();
+    const from = rawFrom || "PromptJump <onboarding@resend.dev>";
+    if (to) {
+      console.log(`Sending a test email to ${to} via Resend...`);
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendApiKey.trim()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from,
+          to: [to],
+          subject: "PromptJump test email via Resend",
+          html: "<p>If you can read this, Resend email sending works perfectly!</p>",
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        console.error("RESEND TEST FAILED ✗:", data?.message || data?.error || res.statusText);
+        process.exit(1);
+      }
+      console.log("TEST EMAIL SENT VIA RESEND: SUCCESS ✓", data);
+    } else {
+      console.log("RESEND_API_KEY is configured. To test sending, run: node scripts/testEmail.js your@email.com");
+    }
+    return;
+  }
+
   if (!user || !pass) {
-    console.error("ERROR: EMAIL_USER / EMAIL_PASS is missing in backend/config/config.env");
+    console.error("ERROR: Neither RESEND_API_KEY nor EMAIL_USER / EMAIL_PASS is set in backend/config/config.env");
     process.exit(1);
   }
 
