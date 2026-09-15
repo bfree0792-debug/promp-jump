@@ -1,26 +1,18 @@
 const express = require("express");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
 const Prompt = require("../models/Prompt");
 const { toRelativeUploadUrl } = require("../utils/media");
 const { adminRateLimiter } = require("../middlewares/rateLimiter");
 const { requireAdminSession } = require("../middlewares/adminSession");
+const { uploadToSupabase, deleteFromSupabase } = require("../utils/supabaseStorage");
 
 const router = express.Router();
 
-const uploadDir = path.join(__dirname, "../uploads/prompts");
-fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname) || "";
-    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-  },
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max file size
 });
-
-const upload = multer({ storage });
 
 function mediaTypeFromMime(mime = "") {
   if (mime.startsWith("video/")) return "Video";
@@ -81,7 +73,7 @@ router.post("/", requireAdminSession, adminRateLimiter, upload.single("media"), 
     }
 
     const type = mediaTypeFromMime(req.file.mimetype);
-    const mediaUrl = `/uploads/prompts/${req.file.filename}`;
+    const mediaUrl = await uploadToSupabase(req.file, "prompts");
 
     const prompt = await Prompt.create({
       title: title || req.file.originalname,
@@ -101,7 +93,8 @@ router.post("/", requireAdminSession, adminRateLimiter, upload.single("media"), 
 
     res.status(201).json(prompt.toJSON());
   } catch (error) {
-    res.status(500).json({ message: "Could not create prompt." });
+    console.error("Error creating prompt:", error);
+    res.status(500).json({ message: error.message || "Could not create prompt." });
   }
 });
 
@@ -156,16 +149,23 @@ router.patch("/:id", requireAdminSession, adminRateLimiter, upload.single("media
 
     if (req.file) {
       const type = mediaTypeFromMime(req.file.mimetype);
-      const mediaUrl = `/uploads/prompts/${req.file.filename}`;
+      const oldMediaUrl = prompt.mediaUrl;
+      const mediaUrl = await uploadToSupabase(req.file, "prompts");
       prompt.type = type;
       prompt.mediaUrl = mediaUrl;
       prompt.thumbnail = mediaUrl;
+
+      // Clean up previous image if it was hosted on Supabase
+      if (oldMediaUrl && oldMediaUrl !== mediaUrl) {
+        deleteFromSupabase(oldMediaUrl).catch(() => {});
+      }
     }
 
     await prompt.save();
     res.json(prompt.toJSON());
   } catch (error) {
-    res.status(500).json({ message: "Could not update prompt." });
+    console.error("Error updating prompt:", error);
+    res.status(500).json({ message: error.message || "Could not update prompt." });
   }
 });
 
@@ -177,16 +177,13 @@ router.delete("/:id", requireAdminSession, adminRateLimiter, async (req, res) =>
       return res.status(404).json({ message: "Prompt not found." });
     }
 
-    try {
-      const filename = path.basename(String(deleted.mediaUrl || ""));
-      const localPath = path.join(uploadDir, filename);
-      if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
-    } catch {
-      // ignore cleanup errors
+    if (deleted.mediaUrl) {
+      deleteFromSupabase(deleted.mediaUrl).catch(() => {});
     }
 
     res.json({ message: "Prompt deleted." });
   } catch (error) {
+    console.error("Error deleting prompt:", error);
     res.status(500).json({ message: "Could not delete prompt." });
   }
 });

@@ -180,12 +180,24 @@ async function sendPasswordResetEmail(to, resetLink) {
   };
 
   if (getResendApiKey()) {
-    await sendViaResend({
-      to,
-      subject: mailOptions.subject,
-      html: mailOptions.html,
-    });
-    return;
+    try {
+      await sendViaResend({
+        to,
+        subject: mailOptions.subject,
+        html: mailOptions.html,
+      });
+      return;
+    } catch (resendErr) {
+      console.warn(`[email] Resend delivery failed: ${resendErr.message}`);
+      // If Gmail SMTP credentials exist, seamlessly fall back to Gmail SMTP
+      if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        console.log(`[email] Falling back to Gmail SMTP for ${to}...`);
+        await getTransporter().sendMail(mailOptions);
+        console.log(`[email] Email sent successfully via Gmail SMTP to ${to}`);
+        return;
+      }
+      throw resendErr;
+    }
   }
 
   await getTransporter().sendMail(mailOptions);

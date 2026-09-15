@@ -1,26 +1,16 @@
 const express = require("express");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
 const Category = require("../models/Category");
 const { adminRateLimiter } = require("../middlewares/rateLimiter");
 const { requireAdminSession } = require("../middlewares/adminSession");
+const { uploadToSupabase, deleteFromSupabase } = require("../utils/supabaseStorage");
 
 const router = express.Router();
 
-const uploadDir = path.join(__dirname, "../uploads/categories");
-fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname) || "";
-    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-  },
-});
-
+const storage = multer.memoryStorage();
 const upload = multer({
   storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (_req, file, cb) => {
     if (file.mimetype.startsWith("image/")) {
       cb(null, true);
@@ -53,7 +43,7 @@ router.post("/", requireAdminSession, adminRateLimiter, upload.single("icon"), a
 
     let iconUrl = "";
     if (req.file) {
-      iconUrl = `/uploads/categories/${req.file.filename}`;
+      iconUrl = await uploadToSupabase(req.file, "categories");
     }
 
     const category = await Category.create({
@@ -85,7 +75,7 @@ router.patch("/:id", requireAdminSession, adminRateLimiter, upload.single("icon"
       description: description || "",
     };
     if (req.file) {
-      updates.icon_url = `/uploads/categories/${req.file.filename}`;
+      updates.icon_url = await uploadToSupabase(req.file, "categories");
     }
 
     const category = await Category.findByIdAndUpdate(req.params.id, updates);
@@ -93,13 +83,8 @@ router.patch("/:id", requireAdminSession, adminRateLimiter, upload.single("icon"
       return res.status(404).json({ message: "Category not found." });
     }
 
-    if (req.file && current.iconUrl) {
-      try {
-        const oldPath = path.join(uploadDir, path.basename(String(current.iconUrl)));
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      } catch {
-        // ignore cleanup errors
-      }
+    if (req.file && current.iconUrl && current.iconUrl !== updates.icon_url) {
+      deleteFromSupabase(current.iconUrl).catch(() => {});
     }
 
     res.json(category.toJSON());
@@ -120,14 +105,8 @@ router.delete("/:id", requireAdminSession, adminRateLimiter, async (req, res) =>
       return res.status(404).json({ message: "Category not found." });
     }
 
-    try {
-      if (deleted.iconUrl) {
-        const filename = path.basename(String(deleted.iconUrl));
-        const localPath = path.join(uploadDir, filename);
-        if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
-      }
-    } catch {
-      // ignore cleanup errors
+    if (deleted.iconUrl) {
+      deleteFromSupabase(deleted.iconUrl).catch(() => {});
     }
 
     res.json({ message: "Category deleted successfully.", category: deleted });

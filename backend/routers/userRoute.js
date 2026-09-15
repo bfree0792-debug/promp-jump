@@ -1,28 +1,16 @@
 const express = require("express");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
 const User = require("../models/User");
 const Prompt = require("../models/Prompt");
 const SubscriptionPlan = require("../models/SubscriptionPlan");
 const { userRateLimiter, adminRateLimiter } = require("../middlewares/rateLimiter");
 const { requireAdminSession } = require("../middlewares/adminSession");
+const { uploadToSupabase, deleteFromSupabase } = require("../utils/supabaseStorage");
 
 const router = express.Router();
 
-const avatarDir = path.join(__dirname, "../uploads/avatars");
-fs.mkdirSync(avatarDir, { recursive: true });
-
-const avatarStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, avatarDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname) || ".jpg";
-    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-  },
-});
-
 const uploadAvatar = multer({
-  storage: avatarStorage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!file.mimetype.startsWith("image/")) {
@@ -280,8 +268,13 @@ router.post("/:id/avatar", userRateLimiter, uploadAvatar.single("avatar"), async
       return res.status(400).json({ message: "Avatar image is required." });
     }
 
-    user.avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    const oldAvatarUrl = user.avatarUrl;
+    user.avatarUrl = await uploadToSupabase(req.file, "avatars");
     await user.save();
+
+    if (oldAvatarUrl && oldAvatarUrl !== user.avatarUrl) {
+      deleteFromSupabase(oldAvatarUrl).catch(() => {});
+    }
 
     res.json(user.toSafeJSON());
   } catch (error) {

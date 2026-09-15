@@ -78,7 +78,9 @@ async function main() {
     process.exit(1);
   }
 
-  if (!looksLikeAppPassword(pass)) {
+  const isBrevo = (process.env.EMAIL_SMTP_HOST || "").includes("brevo.com") || (user || "").includes("brevo.com");
+
+  if (!isBrevo && !looksLikeAppPassword(pass)) {
     console.error("ERROR: EMAIL_PASS is NOT a Gmail App Password.");
     console.error("  Generate one at https://myaccount.google.com/apppasswords");
     console.error("  (First enable 2-Step Verification at https://myaccount.google.com/security)");
@@ -86,11 +88,18 @@ async function main() {
     process.exit(1);
   }
 
+  const host = String(process.env.EMAIL_SMTP_HOST || "smtp.gmail.com").trim();
+  const port = Number(process.env.EMAIL_SMTP_PORT || (isBrevo ? 587 : 465));
+  const secure = process.env.EMAIL_SMTP_SECURE !== undefined
+    ? String(process.env.EMAIL_SMTP_SECURE).toLowerCase() === "true"
+    : port === 465;
+
   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
+    host,
+    port,
+    secure,
     auth: { user, pass },
+    family: 4,
     connectionTimeout: 15000,
     greetingTimeout: 15000,
     socketTimeout: 15000,
