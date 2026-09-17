@@ -26,15 +26,27 @@ function getTransporter() {
     return transporter;
   }
 
-  const port = Number(process.env.EMAIL_SMTP_PORT || 465);
+  const port = Number(process.env.EMAIL_SMTP_PORT || 587);
   const secure = process.env.EMAIL_SMTP_SECURE !== undefined
     ? String(process.env.EMAIL_SMTP_SECURE).toLowerCase() === "true"
     : port === 465;
 
+  // Auto-detect Render Free tier blocking standard ports 25, 465, 587 when using Brevo SMTP.
+  // Port 2525 is supported by Brevo and is unblocked on Render.
+  let targetPort = port;
+  const host = String(process.env.EMAIL_SMTP_HOST || "smtp.gmail.com").trim();
+  if (
+    (targetPort === 587 || targetPort === 25 || targetPort === 465) &&
+    host.includes("brevo.com") &&
+    (process.env.RENDER || !process.env.EMAIL_SMTP_PORT || process.env.EMAIL_SMTP_PORT === "587")
+  ) {
+    targetPort = 2525;
+  }
+
   transporter = nodemailer.createTransport({
-    host: String(process.env.EMAIL_SMTP_HOST || "smtp.gmail.com").trim(),
-    port,
-    secure,
+    host,
+    port: targetPort,
+    secure: targetPort === 465 ? true : secure,
     auth: {
       user: String(process.env.EMAIL_USER || "").trim(),
       pass: String(process.env.EMAIL_PASS || "").replace(/\s+/g, ""),
@@ -46,6 +58,61 @@ function getTransporter() {
   });
 
   return transporter;
+}
+
+function getBrevoApiKey() {
+  return String(process.env.BREVO_API_KEY || "").trim();
+}
+
+/**
+ * Send an email via Brevo's HTTPS REST API (api.brevo.com/v3/smtp/email).
+ * Uses standard port 443 HTTPS which is never blocked by cloud platforms like Render.
+ * Requires a Brevo API key (starts with "xkeysib-").
+ */
+async function sendViaBrevo({ to, subject, html }) {
+  const apiKey = getBrevoApiKey();
+  if (!apiKey) {
+    throw new Error("BREVO_API_KEY is not configured.");
+  }
+
+  const rawFrom = String(process.env.EMAIL_FROM || "PromptJump <bfree0792@gmail.com>").trim();
+  let senderName = "PromptJump";
+  let senderEmail = "bfree0792@gmail.com";
+
+  const match = rawFrom.match(/^(?:([^<]+)<)?([^>]+)>?$/);
+  if (match) {
+    if (match[1]) senderName = match[1].trim();
+    if (match[2]) senderEmail = match[2].trim();
+  } else if (rawFrom) {
+    senderEmail = rawFrom;
+  }
+
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      "api-key": apiKey,
+    },
+    body: JSON.stringify({
+      sender: { name: senderName, email: senderEmail },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    }),
+  });
+
+  const responseData = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const errorMsg =
+      responseData?.message ||
+      responseData?.error ||
+      `HTTP ${response.status} ${response.statusText}`;
+    throw new Error(`Brevo API error: ${errorMsg}`);
+  }
+
+  return responseData;
 }
 
 /**
@@ -101,6 +168,11 @@ async function sendViaResend({ to, subject, html }) {
  * surface immediately instead of failing silently on the first reset attempt.
  */
 async function verifyEmailConfig() {
+  if (getBrevoApiKey()) {
+    console.log("[email] BREVO_API_KEY detected. Using Brevo HTTPS API (Render Free tier compatible).");
+    return true;
+  }
+
   if (getResendApiKey()) {
     console.log("[email] RESEND_API_KEY detected. Using Resend HTTPS API (Render Free tier compatible).");
     return true;
@@ -108,7 +180,7 @@ async function verifyEmailConfig() {
 
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.warn(
-      "[email] Neither RESEND_API_KEY nor EMAIL_USER/EMAIL_PASS is set. Password reset emails will not be sent."
+      "[email] Neither BREVO_API_KEY, RESEND_API_KEY nor EMAIL_USER/EMAIL_PASS is set. Password reset emails will not be sent."
     );
     return false;
   }
@@ -179,6 +251,33 @@ async function sendPasswordResetEmail(to, resetLink) {
     `,
   };
 
+  if (getBrevoApiKey()) {
+    try {
+      await sendViaBrevo({
+        to,
+        subject: mailOptions.subject,
+        html: mailOptions.html,
+      });
+      return;
+    } catch (brevoErr) {
+      console.warn(`[email] Brevo API delivery failed: ${brevoErr.message}`);
+      if (getResendApiKey()) {
+        try {
+          await sendViaResend({ to, subject: mailOptions.subject, html: mailOptions.html });
+          return;
+        } catch (resendErr) {
+          console.warn(`[email] Resend delivery also failed: ${resendErr.message}`);
+        }
+      }
+      if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        console.log(`[email] Falling back to SMTP for ${to}...`);
+        await getTransporter().sendMail(mailOptions);
+        return;
+      }
+      throw brevoErr;
+    }
+  }
+
   if (getResendApiKey()) {
     try {
       await sendViaResend({
@@ -189,11 +288,11 @@ async function sendPasswordResetEmail(to, resetLink) {
       return;
     } catch (resendErr) {
       console.warn(`[email] Resend delivery failed: ${resendErr.message}`);
-      // If Gmail SMTP credentials exist, seamlessly fall back to Gmail SMTP
+      // If SMTP credentials exist, seamlessly fall back to SMTP
       if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        console.log(`[email] Falling back to Gmail SMTP for ${to}...`);
+        console.log(`[email] Falling back to SMTP for ${to}...`);
         await getTransporter().sendMail(mailOptions);
-        console.log(`[email] Email sent successfully via Gmail SMTP to ${to}`);
+        console.log(`[email] Email sent successfully via SMTP to ${to}`);
         return;
       }
       throw resendErr;
