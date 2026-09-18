@@ -1,9 +1,18 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { isAuthenticated } from "../lib/auth";
+import { useEffect } from "react";
+import { Outlet } from "react-router-dom";
+import { isAuthenticated, redirectToLogin } from "../lib/auth";
 
 export default function ProtectedRoute() {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
+  const authed = isAuthenticated();
+
+  useEffect(() => {
+    if (!authed) {
+      redirectToLogin();
+    }
+  }, [authed]);
+
+  if (!authed) {
+    return null;
   }
 
   return <Outlet />;

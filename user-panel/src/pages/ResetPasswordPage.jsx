@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { LOGIN_URL, redirectToLogin } from "../lib/auth";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://promp-jump-54.onrender.com";
 
@@ -10,7 +11,6 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const token = searchParams.get("token");
 
@@ -48,7 +48,7 @@ export default function ResetPasswordPage() {
       setPassword("");
       setConfirmPassword("");
 
-      setTimeout(() => navigate("/login", { replace: true }), 2000);
+      setTimeout(() => redirectToLogin(), 2000);
     } catch (err) {
       setError(err.message || "Failed to reset password. Please try again.");
     } finally {
@@ -125,9 +125,9 @@ export default function ResetPasswordPage() {
         </form>
 
         <p className="text-center text-gray-600 text-sm mt-6">
-          <Link to="/login" className="text-indigo-600 hover:underline">
+          <a href={LOGIN_URL} className="text-indigo-600 hover:underline">
             Back to Login
-          </Link>
+          </a>
         </p>
       </div>
     </div>

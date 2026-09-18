@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { LOGIN_URL } from "../lib/auth";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://promp-jump-54.onrender.com";
 
@@ -105,9 +105,9 @@ export default function ForgotPasswordPage() {
 
         <p className="text-center text-gray-600 text-sm mt-6">
           Remember your password?{" "}
-          <Link to="/login" className="text-indigo-600 hover:underline">
+          <a href={LOGIN_URL} className="text-indigo-600 hover:underline">
             Log in here
-          </Link>
+          </a>
         </p>
       </div>
     </div>
