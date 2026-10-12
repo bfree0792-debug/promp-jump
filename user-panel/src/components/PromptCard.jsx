@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Bookmark,
   Crown,
@@ -16,8 +16,39 @@ function promptMedia(prompt) {
   return mediaUrl(prompt.thumbnail || prompt.mediaUrl);
 }
 
+function usePromptDownload(copyPromptText) {
+  const [downloading, setDownloading] = useState(false);
+  const inFlight = useRef(false);
+
+  async function downloadPromptText(promptId, text) {
+    if (inFlight.current) return;
+
+    inFlight.current = true;
+    setDownloading(true);
+    try {
+      return await copyPromptText(promptId, text);
+    } finally {
+      inFlight.current = false;
+      setDownloading(false);
+    }
+  }
+
+  return [downloading, downloadPromptText];
+}
+
+function DownloadSpinner() {
+  return (
+    <span className="download-spinner" aria-hidden="true">
+      {Array.from({ length: 10 }, (_, index) => (
+        <span key={index} />
+      ))}
+    </span>
+  );
+}
+
 export function LandscapePromptCard({ prompt, onOpen }) {
   const { isSaved, isLiked, toggleSave, toggleLike, copyPromptText } = useLibrary();
+  const [downloading, downloadPromptText] = usePromptDownload(copyPromptText);
   const isVideo = prompt.type === "Video" || (prompt.mediaUrl && /\.(mp4|webm|mov|ogg)$/i.test(prompt.mediaUrl));
   const media = promptMedia(prompt);
   const saved = isSaved(prompt.id);
@@ -110,12 +141,15 @@ export function LandscapePromptCard({ prompt, onOpen }) {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              copyPromptText(prompt.id, prompt.description || prompt.title);
+              downloadPromptText(prompt.id, prompt.description || prompt.title);
             }}
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-white/20 text-white hover:bg-white/30 backdrop-blur-md transition-colors"
-            title="Copy Prompt"
+            disabled={downloading}
+            aria-label={downloading ? "Downloading prompt" : "Copy prompt"}
+            aria-busy={downloading}
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-white/20 text-white hover:bg-white/30 backdrop-blur-md transition-colors disabled:cursor-wait"
+            title={downloading ? "Downloading..." : "Copy Prompt"}
           >
-            <Download size={13} />
+            {downloading ? <DownloadSpinner /> : <Download size={13} />}
           </button>
         </div>
       </div>
@@ -125,6 +159,7 @@ export function LandscapePromptCard({ prompt, onOpen }) {
 
 export function TrendingPromptCard({ prompt, onOpen }) {
   const { isSaved, isLiked, toggleSave, toggleLike, copyPromptText } = useLibrary();
+  const [downloading, downloadPromptText] = usePromptDownload(copyPromptText);
   const isVideo = prompt.type === "Video";
   const media = promptMedia(prompt);
   const saved = isSaved(prompt.id);
@@ -187,12 +222,15 @@ export function TrendingPromptCard({ prompt, onOpen }) {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            copyPromptText(prompt.id, prompt.description || prompt.title);
+            downloadPromptText(prompt.id, prompt.description || prompt.title);
           }}
-          className="w-8 h-8 rounded-full flex items-center justify-center bg-white/90 text-slate-700 hover:bg-white backdrop-blur-sm"
-          title="Download"
+          disabled={downloading}
+          aria-label={downloading ? "Downloading prompt" : "Download prompt"}
+          aria-busy={downloading}
+          className="w-8 h-8 rounded-full flex items-center justify-center bg-white/90 text-slate-700 hover:bg-white backdrop-blur-sm disabled:cursor-wait"
+          title={downloading ? "Downloading..." : "Download"}
         >
-          <Download size={15} />
+          {downloading ? <DownloadSpinner /> : <Download size={15} />}
         </button>
       </div>
     </div>
@@ -201,6 +239,7 @@ export function TrendingPromptCard({ prompt, onOpen }) {
 
 export function PromptCard({ prompt, onOpen, mediaFit = "cover" }) {
   const { isSaved, isLiked, toggleSave, toggleLike, copyPromptText } = useLibrary();
+  const [downloading, downloadPromptText] = usePromptDownload(copyPromptText);
   const isVideo = prompt.type === "Video";
   const media = promptMedia(prompt);
   const saved = isSaved(prompt.id);
@@ -268,11 +307,14 @@ export function PromptCard({ prompt, onOpen, mediaFit = "cover" }) {
             </button>
             <button
               type="button"
-              onClick={() => copyPromptText(prompt.id, prompt.description || prompt.title)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-50 text-slate-500 hover:bg-slate-100"
-              title="Download (copy text)"
+              onClick={() => downloadPromptText(prompt.id, prompt.description || prompt.title)}
+              disabled={downloading}
+              aria-label={downloading ? "Downloading prompt" : "Download prompt"}
+              aria-busy={downloading}
+              className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-50 text-slate-500 hover:bg-slate-100 disabled:cursor-wait"
+              title={downloading ? "Downloading..." : "Download (copy text)"}
             >
-              <Download size={14} />
+              {downloading ? <DownloadSpinner /> : <Download size={14} />}
             </button>
           </div>
           <span className="flex items-center gap-1 text-xs text-amber-600 font-medium">
@@ -286,6 +328,7 @@ export function PromptCard({ prompt, onOpen, mediaFit = "cover" }) {
 
 export function PromptModal({ prompt, onClose }) {
   const { isSaved, isLiked, toggleSave, toggleLike, copyPromptText, recordHistory, usage, user } = useLibrary();
+  const [downloading, downloadPromptText] = usePromptDownload(copyPromptText);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -306,7 +349,7 @@ export function PromptModal({ prompt, onClose }) {
   const limitReached = limitValue !== null && usedValue >= limitValue;
 
   async function handleDownloadCopy() {
-    const result = await copyPromptText(prompt.id, prompt.description || prompt.title);
+    const result = await downloadPromptText(prompt.id, prompt.description || prompt.title);
     if (!result?.error) {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
@@ -399,15 +442,16 @@ export function PromptModal({ prompt, onClose }) {
               </button>
               <button
                 onClick={handleDownloadCopy}
-                disabled={limitReached}
+                disabled={limitReached || downloading}
+                aria-busy={downloading}
                 className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold ${
                   limitReached
                     ? "bg-slate-300 text-slate-500 cursor-not-allowed"
-                    : "bg-slate-900 text-white hover:bg-slate-800"
+                    : "bg-slate-900 text-white hover:bg-slate-800 disabled:cursor-wait"
                 }`}
               >
-                <Download size={15} />
-                {copied ? "Copied!" : "Download"}
+                {downloading ? <DownloadSpinner /> : <Download size={15} />}
+                {downloading ? "Downloading..." : copied ? "Copied!" : "Download"}
               </button>
             </div>
           </div>
